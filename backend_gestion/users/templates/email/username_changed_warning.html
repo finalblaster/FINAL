@@ -1,0 +1,177 @@
+{% load i18n %}
+{% block html_body %}
+<!DOCTYPE html>
+<html lang="{{ current_language|default:'fr' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site_name }} - {% blocktrans %}Alerte de sécurité{% endblocktrans %}</title>
+    <style>
+        :root {
+            --primary-color: #2563EB;
+            --primary-dark: #1D4ED8;
+            --background-color: #f7f7f7;
+            --white: #ffffff;
+            --text-color: #333;
+            --subtext-color: #777;
+            --font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            border-spacing: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 30px;
+            text-align: center;
+            background-color: var(--white);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .logo {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .content h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .content p {
+            font-size: 16px;
+            color: var(--subtext-color);
+            margin-bottom: 30px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .footer {
+            background-color: var(--background-color);
+            color: var(--subtext-color);
+            text-align: center;
+            padding: 20px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            .content h1 {
+                font-size: 20px;
+            }
+
+            .button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center" style="padding: 40px;">
+                <table class="container" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td class="header">
+                            <img src="https://i.imgur.com/adlPG8Q.png" alt="{% blocktrans with site_name=site_name %}Logo de {{ site_name }} {% endblocktrans %}" class="logo" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="content">
+                            <h1>{% blocktrans %}Alerte de sécurité{% endblocktrans %}</h1>
+
+                            <p>
+                                {% blocktrans %}Bonjour{% endblocktrans %} {{ user.first_name }} {{ user.last_name }},
+                            </p>
+
+                            <p>
+                                {% blocktrans with site_name=site_name %}Une tentative de changement de votre adresse email a été détectée sur {{ site_name }}.{% endblocktrans %}
+                            </p>
+
+                            <p>
+                                <strong>
+                                    {% blocktrans %}Si vous n'êtes pas à l'origine de cette demande, veuillez réinitialiser votre mot de passe immédiatement en cliquant sur le lien ci-dessous :{% endblocktrans %}
+                                </strong>
+                            </p>
+
+                            <a href="{{ protocol }}://{{ domain }}/reset-password" class="button" target="_blank">
+                                {% blocktrans %}Réinitialiser mon mot de passe{% endblocktrans %}
+                            </a>
+
+                            <p style="margin-top: 20px;">
+                                {% blocktrans %}Si vous êtes à l'origine de cette demande, vous pouvez ignorer cet e-mail en toute sécurité.{% endblocktrans %}
+                            </p>
+
+                            <p>
+                                {% blocktrans %}Par mesure de sécurité, nous vous recommandons de changer régulièrement votre mot de passe.{% endblocktrans %}
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="footer">
+                            <p>{% blocktrans %}Merci d'utiliser notre site !{% endblocktrans %}</p>
+                            <p>{% blocktrans with site_name=site_name %}L'équipe de {{ site_name }}{% endblocktrans %}</p>
+                            <p>
+                                <a href="{{ protocol }}://{{ domain }}">{% blocktrans %}Visitez notre site{% endblocktrans %}</a> |
+                                <a href="mailto:support@sputnik.com">{% blocktrans %}Contactez-nous{% endblocktrans %}</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+{% endblock html_body %}

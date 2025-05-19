@@ -1,0 +1,1 @@
+{% load i18n %} {{ site_name }}-{% trans "Alerte de changement d'adresse email" %}

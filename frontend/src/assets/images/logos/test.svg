@@ -1,0 +1,245 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" id="svgAnimation">
+  <!-- Définir un dégradé radial très prononcé -->
+  <defs>
+    <radialGradient id="blueRadialGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#a8c7ff" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="1" />
+    </radialGradient>
+  </defs>
+  <!-- Définir un masque avec une ellipse intérieure animée -->
+  <mask id="ellipseMask">
+    <rect width="100" height="100" fill="white" />
+    <ellipse cx="50" cy="50" rx="35" ry="10" fill="black">
+      <!-- Animation de rx (rayon horizontal) -->
+      <animate
+        id="animateRxInner"
+        attributeName="rx"
+        values="35;45;35"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+      <!-- Animation de ry (rayon vertical) -->
+      <animate
+        id="animateRyInner"
+        attributeName="ry"
+        values="10;20;10"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+    </ellipse>
+  </mask>
+  <!-- Premier élément (rotation de 0 degrés) -->
+  <g transform="rotate(0, 50, 50)">
+    <!-- Animation de rotation -->
+    <animateTransform
+      id="animateRotate0"
+      attributeName="transform"
+      type="rotate"
+      from="0 50 50"
+      to="360 50 50"
+      begin="indefinite"
+      dur="2s"
+      repeatCount="1"
+      fill="freeze"
+      calcMode="spline"
+      keyTimes="0;1"
+      keySplines="0.1 0.8 0.2 1"
+    />
+    <!-- Ellipse extérieure avec masque et dégradé radial -->
+    <ellipse cx="50" cy="50" rx="40" ry="20" fill="url(#blueRadialGradient)" mask="url(#ellipseMask)">
+      <!-- Animation de rx (rayon horizontal) -->
+      <animate
+        id="animateRxOuter0"
+        attributeName="rx"
+        values="40;50;40"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+      <!-- Animation de ry (rayon vertical) -->
+      <animate
+        id="animateRyOuter0"
+        attributeName="ry"
+        values="20;30;20"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+    </ellipse>
+  </g>
+  <!-- Répéter pour les 4 autres éléments avec des rotations de 72, 144, 216 et 288 degrés -->
+  <g transform="rotate(72, 50, 50)">
+    <animateTransform
+      id="animateRotate72"
+      attributeName="transform"
+      type="rotate"
+      from="72 50 50"
+      to="432 50 50"
+      begin="indefinite"
+      dur="2s"
+      repeatCount="1"
+      fill="freeze"
+      calcMode="spline"
+      keyTimes="0;1"
+      keySplines="0.1 0.8 0.2 1"
+    />
+    <ellipse cx="50" cy="50" rx="40" ry="20" fill="url(#blueRadialGradient)" mask="url(#ellipseMask)">
+      <animate
+        id="animateRxOuter72"
+        attributeName="rx"
+        values="40;50;40"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+      <animate
+        id="animateRyOuter72"
+        attributeName="ry"
+        values="20;30;20"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+    </ellipse>
+  </g>
+  <g transform="rotate(144, 50, 50)">
+    <animateTransform
+      id="animateRotate144"
+      attributeName="transform"
+      type="rotate"
+      from="144 50 50"
+      to="504 50 50"
+      begin="indefinite"
+      dur="2s"
+      repeatCount="1"
+      fill="freeze"
+      calcMode="spline"
+      keyTimes="0;1"
+      keySplines="0.1 0.8 0.2 1"
+    />
+    <ellipse cx="50" cy="50" rx="40" ry="20" fill="url(#blueRadialGradient)" mask="url(#ellipseMask)">
+      <animate
+        id="animateRxOuter144"
+        attributeName="rx"
+        values="40;50;40"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+      <animate
+        id="animateRyOuter144"
+        attributeName="ry"
+        values="20;30;20"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+    </ellipse>
+  </g>
+  <g transform="rotate(216, 50, 50)">
+    <animateTransform
+      id="animateRotate216"
+      attributeName="transform"
+      type="rotate"
+      from="216 50 50"
+      to="576 50 50"
+      begin="indefinite"
+      dur="2s"
+      repeatCount="1"
+      fill="freeze"
+      calcMode="spline"
+      keyTimes="0;1"
+      keySplines="0.1 0.8 0.2 1"
+    />
+    <ellipse cx="50" cy="50" rx="40" ry="20" fill="url(#blueRadialGradient)" mask="url(#ellipseMask)">
+      <animate
+        id="animateRxOuter216"
+        attributeName="rx"
+        values="40;50;40"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+      <animate
+        id="animateRyOuter216"
+        attributeName="ry"
+        values="20;30;20"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+    </ellipse>
+  </g>
+  <g transform="rotate(288, 50, 50)">
+    <animateTransform
+      id="animateRotate288"
+      attributeName="transform"
+      type="rotate"
+      from="288 50 50"
+      to="648 50 50"
+      begin="indefinite"
+      dur="2s"
+      repeatCount="1"
+      fill="freeze"
+      calcMode="spline"
+      keyTimes="0;1"
+      keySplines="0.1 0.8 0.2 1"
+    />
+    <ellipse cx="50" cy="50" rx="40" ry="20" fill="url(#blueRadialGradient)" mask="url(#ellipseMask)">
+      <animate
+        id="animateRxOuter288"
+        attributeName="rx"
+        values="40;50;40"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+      <animate
+        id="animateRyOuter288"
+        attributeName="ry"
+        values="20;30;20"
+        keyTimes="0;0.5;1"
+        begin="indefinite"
+        dur="2s"
+        calcMode="spline"
+        keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+        repeatCount="1"
+      />
+    </ellipse>
+  </g>
+</svg>

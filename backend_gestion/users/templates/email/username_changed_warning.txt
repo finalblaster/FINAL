@@ -1,0 +1,38 @@
+{% load i18n %}
+{% block text_body %}
+{% blocktrans with site_name=site_name %}Alerte de sécurité - {{ site_name }}{% endblocktrans %}
+
+{% blocktrans with first_name=user.first_name last_name=user.last_name %}
+Bonjour {{ first_name }} {{ last_name }},
+{% endblocktrans %}
+
+{% blocktrans with site_name=site_name %}
+Une demande de changement d'adresse email a été effectuée sur votre compte {{ site_name }}.
+{% endblocktrans %}
+
+{% blocktrans %}
+Si vous n'êtes pas à l'origine de cette demande, veuillez réinitialiser votre mot de passe immédiatement en cliquant sur le lien ci-dessous :
+{% endblocktrans %}
+
+{{ protocol }}://{{ domain }}/reset-password
+
+{% blocktrans %}
+Si vous êtes à l'origine de cette demande, vous pouvez ignorer cet email.
+{% endblocktrans %}
+
+{% blocktrans %}
+Par mesure de sécurité, nous vous recommandons de changer régulièrement votre mot de passe.
+{% endblocktrans %}
+
+{% blocktrans %}
+Merci d'utiliser notre site !
+{% endblocktrans %}
+
+{% blocktrans with site_name=site_name %}
+L'équipe de {{ site_name }}
+{% endblocktrans %}
+
+{% blocktrans %}
+Contact : support@sputnik.com
+{% endblocktrans %}
+{% endblock text_body %}

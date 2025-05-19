@@ -1,0 +1,7 @@
+Bonjour {{ user.username }},
+
+Merci de vous être inscrit ! Veuillez cliquer sur le lien ci-dessous pour activer votre compte :
+{{ protocol }}://{{ domain }}{% url 'user_activation' uid=uid token=token %}
+
+Cordialement,
+L'équipe de Sputnik

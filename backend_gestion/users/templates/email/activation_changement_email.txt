@@ -1,0 +1,18 @@
+{% load i18n %}
+
+{% blocktrans with name=user.first_name lastname=user.last_name %}Bonjour {{ name }} {{ lastname }},{% endblocktrans %}
+
+{% trans "Vous avez demandé à changer votre adresse email sur {{ site_name }}. Pour confirmer ce changement, veuillez cliquer sur le lien ci-dessous :" %}
+
+{{ protocol }}://{{ domain }}/{{ url|safe }}
+
+{% trans "Si vous rencontrez des difficultés pour cliquer sur le lien, vous pouvez le copier et le coller dans votre navigateur." %}
+
+{% trans "Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email." %}
+
+{% trans "Cordialement," %}
+{% blocktrans with site_name=site_name %}L'équipe {{ site_name }}{% endblocktrans %}
+
+{% trans "Visitez notre site :" %} {{ protocol }}://{{ domain }}
+{% trans "Contactez le support :" %} support@sputnik.com
+

@@ -1,0 +1,268 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: %(site_name)s 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-10 12:00+0000\n"
+"PO-Revision-Date: 2024-04-21 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+# Email subject texts
+msgid "Réinitialisez votre mot de passe"
+msgstr "Réinitialisez votre mot de passe"
+
+msgid "Activez votre compte"
+msgstr "Activez votre compte"
+
+msgid "Bienvenue chez"
+msgstr "Bienvenue chez"
+
+msgid "Votre mot de passe"
+msgstr "Votre mot de passe"
+
+msgid "a été modifié"
+msgstr "a été modifié"
+
+# Email activation messages
+msgid "Confirmez votre adresse email"
+msgstr "Confirmez votre adresse email"
+
+msgid "Confirmer mon email"
+msgstr "Confirmer mon email"
+
+msgid "Si le bouton ne fonctionne pas, vous pouvez également utiliser ce lien pour confirmer votre adresse :"
+msgstr "Si le bouton ne fonctionne pas, vous pouvez également utiliser ce lien pour confirmer votre adresse :"
+
+msgid "Cordialement,"
+msgstr "Cordialement,"
+
+msgid "Visitez notre site"
+msgstr "Visitez notre site"
+
+msgid "Contactez-nous"
+msgstr "Contactez-nous"
+
+msgid "Confirmez votre adresse email sur %(site_name)s"
+msgstr "Confirmez votre adresse email sur %(site_name)s"
+
+msgid "Bonjour %(user.first_name)s %(user.last_name)s,"
+msgstr "Bonjour %(user.first_name)s %(user.last_name)s,"
+
+msgid "Merci d'avoir créé un compte sur %(site_name)s ! Pour confirmer votre adresse email et commencer à utiliser notre plateforme, veuillez cliquer sur le bouton ci-dessous :"
+msgstr "Merci d'avoir créé un compte sur %(site_name)s ! Pour confirmer votre adresse email et commencer à utiliser notre plateforme, veuillez cliquer sur le bouton ci-dessous :"
+
+msgid "Si vous rencontrez des difficultés pour cliquer sur le lien, vous pouvez le copier et le coller dans votre navigateur."
+msgstr "Si vous rencontrez des difficultés pour cliquer sur le lien, vous pouvez le copier et le coller dans votre navigateur."
+
+msgid "Cordialement,\nL'équipe %(site_name)s"
+msgstr "Cordialement,\nL'équipe %(site_name)s"
+
+msgid "Visitez notre site : %(protocol)s://%(domain)s\nContactez le support : support@%(site_name)s.com"
+msgstr "Visitez notre site : %(protocol)s://%(domain)s\nContactez le support : support@%(site_name)s.com"
+
+msgid "L'équipe %(site_name)s"
+msgstr "L'équipe %(site_name)s"
+
+msgid "L'équipe de %(site_name)s"
+msgstr "L'équipe de %(site_name)s"
+
+# Password reset messages
+msgid "Réinitialiser mon mot de passe"
+msgstr "Réinitialiser mon mot de passe"
+
+msgid "Bonjour,"
+msgstr "Bonjour,"
+
+msgid "Vous avez demandé la réinitialisation de votre mot de passe sur %(site_name)s. Pour continuer, veuillez cliquer sur le bouton ci-dessous :"
+msgstr "Vous avez demandé la réinitialisation de votre mot de passe sur %(site_name)s. Pour continuer, veuillez cliquer sur le bouton ci-dessous :"
+
+msgid "Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email."
+msgstr "Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email."
+
+msgid "Réinitialisation de mot de passe - %(site_name)s"
+msgstr "Réinitialisation de mot de passe - %(site_name)s"
+
+# Email change confirmation
+msgid "Confirmer votre nouvelle adresse email"
+msgstr "Confirmer votre nouvelle adresse email"
+
+msgid "Confirmer mon nouvel email"
+msgstr "Confirmer mon nouvel email"
+
+msgid "Vous avez demandé à changer votre adresse email sur %(site_name)s. Pour confirmer ce changement, veuillez cliquer sur le bouton ci-dessous :"
+msgstr "Vous avez demandé à changer votre adresse email sur %(site_name)s. Pour confirmer ce changement, veuillez cliquer sur le bouton ci-dessous :"
+
+msgid "Si vous n'avez pas demandé ce changement, veuillez contacter immédiatement le support."
+msgstr "Si vous n'avez pas demandé ce changement, veuillez contacter immédiatement le support."
+
+msgid "Confirmation de changement d'email - %(site_name)s"
+msgstr "Confirmation de changement d'email - %(site_name)s"
+
+msgid "Confirmation de changement d'adresse email"
+msgstr "Confirmation de changement d'adresse email"
+
+# Login notifications
+msgid "Nouvelle connexion détectée"
+msgstr "Nouvelle connexion détectée"
+
+msgid "Une nouvelle connexion a été détectée sur votre compte %(site_name)s."
+msgstr "Une nouvelle connexion a été détectée sur votre compte %(site_name)s."
+
+msgid "Détails de la connexion :"
+msgstr "Détails de la connexion :"
+
+msgid "Date : %(date)s"
+msgstr "Date : %(date)s"
+
+msgid "Adresse IP : %(ip)s"
+msgstr "Adresse IP : %(ip)s"
+
+msgid "Navigateur : %(browser)s"
+msgstr "Navigateur : %(browser)s"
+
+msgid "Si vous n'êtes pas à l'origine de cette connexion, veuillez changer immédiatement votre mot de passe."
+msgstr "Si vous n'êtes pas à l'origine de cette connexion, veuillez changer immédiatement votre mot de passe."
+
+msgid "Notification de sécurité - %(site_name)s"
+msgstr "Notification de sécurité - %(site_name)s"
+
+# Password changed confirmation
+msgid "%(site_name)s - Votre mot de passe a été modifié avec succès !"
+msgstr "%(site_name)s - Votre mot de passe a été modifié avec succès !"
+
+msgid "Merci d'utiliser notre site !"
+msgstr "Merci d'utiliser notre site !"
+
+msgid "Confirmation de changement de mot de passe - %(site_name)s"
+msgstr "Confirmation de changement de mot de passe - %(site_name)s"
+
+msgid "Votre mot de passe sur %(site_name)s a été modifié avec succès. Si vous n'êtes pas à l'origine de cette modification, veuillez nous contacter immédiatement."
+msgstr "Votre mot de passe sur %(site_name)s a été modifié avec succès. Si vous n'êtes pas à l'origine de cette modification, veuillez nous contacter immédiatement."
+
+msgid "Accéder à %(site_name)s"
+msgstr "Accéder à %(site_name)s"
+
+msgid "Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter."
+msgstr "Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter."
+
+# Password reset email
+msgid "Réinitialisation de mot de passe sur %(site_name)s"
+msgstr "Réinitialisation de mot de passe sur %(site_name)s"
+
+msgid "Vous recevez cet e-mail car vous avez demandé une réinitialisation de votre mot de passe pour votre compte."
+msgstr "Vous recevez cet e-mail car vous avez demandé une réinitialisation de votre mot de passe pour votre compte."
+
+msgid "Veuillez vous rendre à la page suivante pour choisir un nouveau mot de passe :"
+msgstr "Veuillez vous rendre à la page suivante pour choisir un nouveau mot de passe :"
+
+msgid "Votre nom d'utilisateur, au cas où vous l'auriez oublié : %(username)s"
+msgstr "Votre nom d'utilisateur, au cas où vous l'auriez oublié : %(username)s"
+
+msgid "Réinitialisation de votre mot de passe"
+msgstr "Réinitialisation de votre mot de passe"
+
+msgid "Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail."
+msgstr "Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail."
+
+msgid "Votre mot de passe a été modifié avec succès !"
+msgstr "Votre mot de passe a été modifié avec succès !"
+
+msgid "Votre compte sur %(site_name)s a été créé et activé avec succès. Vous pouvez dès à présent profiter de toutes les fonctionnalités de notre plateforme."
+msgstr "Votre compte sur %(site_name)s a été créé et activé avec succès. Vous pouvez dès à présent profiter de toutes les fonctionnalités de notre plateforme."
+
+msgid "Votre compte a été activé avec succès !"
+msgstr "Votre compte a été activé avec succès !"
+
+msgid "Votre compte a été créé et activé avec succès !"
+msgstr "Votre compte a été créé et activé avec succès !"
+
+# Email - Confirmation de changement d'adresse
+msgid "Votre adresse email a été modifiée avec succès !"
+msgstr "Votre adresse email a été modifiée avec succès !"
+
+msgid "Bonjour %(name)s %(lastname)s,"
+msgstr "Bonjour %(name)s %(lastname)s,"
+
+msgid "Nous vous confirmons que l'adresse email associée à votre compte a bien été changée sur %(site_name)s."
+msgstr "Nous vous confirmons que l'adresse email associée à votre compte a bien été changée sur %(site_name)s."
+
+msgid "Si vous n'êtes pas à l'origine de ce changement, veuillez contacter notre support immédiatement."
+msgstr "Si vous n'êtes pas à l'origine de ce changement, veuillez contacter notre support immédiatement."
+
+msgid "Si vous avez des questions ou besoin d'aide, notre équipe reste disponible."
+msgstr "Si vous avez des questions ou besoin d'aide, notre équipe reste disponible."
+
+# New translations from activation_changement_username.html
+msgid "Logo Sputnik"
+msgstr "Logo Sputnik"
+
+msgid "Confirmez le changement de votre adresse email"
+msgstr "Confirmez le changement de votre adresse email"
+
+msgid "Confirmer le changement"
+msgstr "Confirmer le changement"
+
+msgid "Si le bouton ne fonctionne pas, vous pouvez également utiliser ce lien :"
+msgstr "Si le bouton ne fonctionne pas, vous pouvez également utiliser ce lien :"
+
+# Spanish translations
+msgid "Su dirección de correo electrónico ha sido modificada con éxito."
+msgstr "Votre adresse email a été modifiée avec succès."
+
+msgid "Le confirmamos que la dirección de correo electrónico asociada a su cuenta ha sido cambiada correctamente en %(site_name)s."
+msgstr "Nous vous confirmons que l'adresse email associée à votre compte a bien été changée sur %(site_name)s."
+
+msgid "Si no ha solicitado este cambio, por favor contacte a nuestro soporte inmediatamente."
+msgstr "Si vous n'êtes pas à l'origine de ce changement, veuillez contacter notre support immédiatement."
+
+msgid "Acceder a %(site_name)s"
+msgstr "Accéder à %(site_name)s"
+
+msgid "Si tiene alguna pregunta o necesita ayuda, nuestro equipo está disponible."
+msgstr "Si vous avez des questions ou besoin d'aide, notre équipe reste disponible."
+
+msgid "¡Gracias por utilizar nuestro sitio!"
+msgstr "Merci d'utiliser notre site !"
+
+msgid "El equipo de %(site_name)s"
+msgstr "L'équipe de %(site_name)s"
+
+# Security alert - Email change
+msgid "Alerte de sécurité - %(site_name)s"
+msgstr "Alerte de sécurité - %(site_name)s"
+
+msgid "Bonjour %(first_name)s %(last_name)s,"
+msgstr "Bonjour %(first_name)s %(last_name)s,"
+
+msgid "Une demande de changement d'adresse email a été effectuée sur votre compte %(site_name)s."
+msgstr "Une demande de changement d'adresse email a été effectuée sur votre compte %(site_name)s."
+
+msgid "Si vous n'êtes pas à l'origine de cette demande, veuillez réinitialiser votre mot de passe immédiatement en cliquant sur le lien ci-dessous :"
+msgstr "Si vous n'êtes pas à l'origine de cette demande, veuillez réinitialiser votre mot de passe immédiatement en cliquant sur le lien ci-dessous :"
+
+msgid "Contact : support@sputnik.com"
+msgstr "Contact : support@sputnik.com"
+
+msgid "Par mesure de sécurité, nous vous recommandons de changer régulièrement votre mot de passe."
+msgstr "Par mesure de sécurité, nous vous recommandons de changer régulièrement votre mot de passe."
+
+msgid "Alerte de sécurité"
+msgstr "Alerte de sécurité"
+
+msgid "Une tentative de changement de votre adresse email a été détectée sur %(site_name)s."
+msgstr "Une tentative de changement de votre adresse email a été détectée sur %(site_name)s."
+
+
+msgid "Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email."
+msgstr "Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email."
+
+msgid "Bonjour"
+msgstr "Bonjour"
+
+msgid "Si vous êtes à l'origine de cette demande, vous pouvez ignorer cet e-mail en toute sécurité."
+msgstr "Si vous êtes à l'origine de cette demande, vous pouvez ignorer cet e-mail en toute sécurité."

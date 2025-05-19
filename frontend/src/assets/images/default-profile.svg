@@ -1,0 +1,23 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond circulaire avec dégradé bleu subtil -->
+  <circle cx="128" cy="128" r="128" fill="url(#gradient-bg)"/>
+  
+  <!-- Silhouette de la tête avec dégradé -->
+  <circle cx="128" cy="90" r="44" fill="url(#gradient-user)"/>
+  
+  <!-- Corps avec dégradé -->
+  <path d="M198.4 199.2C198.4 174.4 167.2 154.4 128 154.4C88.8 154.4 57.6 174.4 57.6 199.2C76.8 233.6 108.8 256 128 256C153.6 256 185.6 233.6 198.4 199.2Z" fill="url(#gradient-user)"/>
+  
+  <!-- Définition des dégradés -->
+  <defs>
+    <linearGradient id="gradient-bg" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EBF4FF"/>
+      <stop offset="1" stop-color="#DBEAFE"/>
+    </linearGradient>
+    
+    <linearGradient id="gradient-user" x1="128" y1="50" x2="128" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+</svg> 

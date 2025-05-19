@@ -1,0 +1,12 @@
+Bonjour {{ user.first_name }} {{ user.last_name }},
+
+Félicitations ! Votre compte a été créé avec succès.
+
+Pour commencer à utiliser {{ site_name }}, veuillez activer votre compte en suivant le lien ci-dessous :
+
+{{ protocol }}://{{ domain }}{{ url }}
+
+Si vous rencontrez des problèmes pour cliquer sur le lien, copiez et collez l'URL directement dans votre navigateur.
+
+Cordialement,
+L'équipe {{ site_name }}

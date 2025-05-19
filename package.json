@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "lucide-react": "^0.503.0",
+    "react-phone-input-2": "^2.15.1"
+  }
+}

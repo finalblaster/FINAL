@@ -1,0 +1,1 @@
+import i18n from "i18next"; const loadTranslations = async (lang) => { const module = await import("../translations/common"); return module.commonTranslations[lang] || module.commonTranslations.en; }; export { loadTranslations };

@@ -1,0 +1,771 @@
+import { API_CONFIG, API_ENDPOINTS, STORAGE_KEYS } from '@/utils/config';
+import { secureApi } from '@/utils/api';
+import { setUserData, clearUserData, getUserData } from '@/utils/auth';
+
+/**
+ * Service d'authentification avec des fonctions sécurisées
+ */
+class AuthService {
+  /**
+   * Enregistre un nouvel utilisateur
+   * @param {Object} userData - Données d'enregistrement utilisateur
+   * @returns {Promise} - Réponse API
+   */
+  async register(userData) {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      const response = await secureApi.post(API_ENDPOINTS.AUTH.REGISTER, userData, { headers });
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Connecte un utilisateur
+   * @param {Object} userData - Identifiants de connexion
+   * @returns {Promise} - Réponse API incluant les tokens
+   */
+  async login(userData) {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      const response = await secureApi.post(API_ENDPOINTS.AUTH.LOGIN, userData, { headers });
+      
+      if (response.data) {
+        setUserData(response.data);
+      }
+      
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Déconnecte l'utilisateur
+   */
+  logout() {
+    clearUserData();
+  }
+
+  /**
+   * Active un compte utilisateur
+   * @param {Object} userData - Données d'activation (uid, token)
+   * @returns {Promise} - Réponse API
+   */
+  async activate(userData) {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      const response = await secureApi.post(API_ENDPOINTS.AUTH.ACTIVATE, userData, { headers });
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Active une nouvelle adresse email
+   * @param {Object} userData - Données d'activation (uid, token)
+   * @returns {Promise} - Réponse API
+   */
+  async activateEmail(userData) {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage ou utiliser celle fournie
+      const currentLanguage = userData.language || localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      // Créer un objet de données ne contenant que ce dont nous avons besoin
+      const activationData = {
+        uid: userData.uid,
+        token: userData.token
+      };
+      
+      const response = await secureApi.post(API_ENDPOINTS.AUTH.ACTIVATION_EMAIL, activationData, { headers });
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Demande de réinitialisation de mot de passe
+   * @param {Object} userData - Email utilisateur
+   * @returns {Promise} - Réponse API
+   */
+  async resetPassword(userData) {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      const response = await secureApi.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, userData, { headers });
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Confirme la réinitialisation de mot de passe
+   * @param {Object} userData - Données de confirmation (uid, token, password)
+   * @returns {Promise} - Réponse API
+   */
+  async resetPasswordConfirm(userData) {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      const response = await secureApi.post(API_ENDPOINTS.AUTH.RESET_PASSWORD_CONFIRM, userData, { headers });
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Obtient les informations utilisateur
+   * @returns {Promise} - Réponse API avec les données utilisateur
+   */
+  async getUserInfo() {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      const response = await secureApi.get(API_ENDPOINTS.AUTH.USER_INFO, { headers });
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Renvoie l'email de vérification
+   * @param {Object|string} emailData - Email utilisateur ou objet {email, language}
+   * @returns {Promise} - Réponse API
+   */
+  async resendVerification(emailData) {
+    try {
+      let requestData;
+
+      // Vérifier si emailData est une chaîne ou un objet
+      if (typeof emailData === 'string') {
+        requestData = { email: emailData };
+      } else {
+        // emailData est un objet contenant email et potentiellement language
+        requestData = { ...emailData };
+      }
+
+      console.log('Renvoi de vérification avec données:', requestData);
+
+      // Définir l'en-tête Accept-Language si une langue est spécifiée
+      const headers = {};
+      if (requestData.language) {
+        headers['Accept-Language'] = requestData.language;
+      }
+
+      const response = await secureApi.post(
+        API_ENDPOINTS.AUTH.RESEND_ACTIVATION, 
+        requestData,
+        { headers }
+      );
+      
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Change le mot de passe utilisateur
+   * @param {Object} passwordData - Données de changement de mot de passe (current_password, new_password)
+   * @param {string} token - Token d'accès
+   * @returns {Promise} - Réponse API
+   */
+  async changePassword(passwordData, token) {
+    try {
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      const headers = {
+        'Authorization': `JWT ${token}`,
+        'Accept-Language': currentLanguage
+      };
+      
+      // Ajouter la langue actuelle aux données envoyées au serveur
+      const dataWithLanguage = {
+        ...passwordData,
+        language: currentLanguage
+      };
+      
+      console.log("Envoi des données de changement de mot de passe:", JSON.stringify(dataWithLanguage));
+      
+      const response = await secureApi.post(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, dataWithLanguage, { headers });
+      return response.data;
+    } catch (error) {
+      // Afficher les détails exacts de l'erreur
+      console.error("### DÉTAILS ERREUR BRUTE ###");
+      console.error("Status:", error.response?.status);
+      console.error("Message d'erreur:", error.message);
+      
+      // Afficher le corps de réponse de façon plus lisible
+      if (error.response?.data) {
+        console.error("Response body:");
+        if (typeof error.response.data === 'object') {
+          // Afficher chaque champ d'erreur séparément pour plus de clarté
+          Object.keys(error.response.data).forEach(key => {
+            console.error(`  ${key}:`, error.response.data[key]);
+          });
+        } else {
+          console.error("  ", error.response.data);
+        }
+      }
+      
+      console.error("Headers:", JSON.stringify(error.response?.headers, null, 2));
+      console.error("### FIN DÉTAILS ERREUR ###");
+      
+      // Pas de connexion internet
+      if (!navigator.onLine || error.message === 'Network Error') {
+        throw new Error("NETWORK_ERROR");
+      }
+      
+      // Approche simplifiée pour détecter les erreurs de mot de passe
+      // Si l'erreur est un 400 Bad Request et concerne current_password, on suppose que c'est un mot de passe incorrect
+      if (error.response && error.response.status === 400 && error.response.data) {
+        const data = error.response.data;
+        
+        // Vérifier si l'erreur concerne le champ current_password
+        if (data.current_password) {
+          console.log("Erreur sur current_password détectée:", data.current_password);
+          throw new Error("CURRENT_PASSWORD_INCORRECT");
+        }
+        
+        // Fonction d'aide pour vérifier si un message contient un texte donné (insensible à la casse)
+        const containsText = (message, ...searchTerms) => {
+          if (!message) return false;
+          
+          // Si c'est un tableau, vérifier chaque élément
+          if (Array.isArray(message)) {
+            return message.some(msg => {
+              if (typeof msg !== 'string') return false;
+              const lowerMsg = msg.toLowerCase();
+              return searchTerms.some(term => lowerMsg.includes(term.toLowerCase()));
+            });
+          }
+          
+          // Si c'est une chaîne, vérifier directement
+          if (typeof message === 'string') {
+            const lowerMsg = message.toLowerCase();
+            return searchTerms.some(term => lowerMsg.includes(term.toLowerCase()));
+          }
+          
+          return false;
+        };
+        
+        // Vérifier spécifiquement pour les erreurs de mot de passe incorrects dans différentes langues
+        if (data.current_password && Array.isArray(data.current_password)) {
+          // Termes de recherche pour "mot de passe incorrect" dans différentes langues
+          const invalidPasswordTerms = [
+            // Français
+            "mot de passe invalide", "mot de passe incorrect", "mauvais mot de passe",
+            // Anglais
+            "invalid password", "incorrect password", "wrong password", 
+            // Espagnol
+            "contraseña inválida", "contraseña incorrecta", "contraseña no válida", 
+            // Allemand
+            "ungültiges passwort", "falsches passwort", "passwort falsch"
+          ];
+          
+          // Pour toute chaîne dans current_password, vérifier si elle contient l'un des termes
+          for (const msg of data.current_password) {
+            if (typeof msg === 'string') {
+              for (const term of invalidPasswordTerms) {
+                if (msg.toLowerCase().includes(term.toLowerCase())) {
+                  console.log(`Détecté terme "${term}" dans message "${msg}"`);
+                  throw new Error("CURRENT_PASSWORD_INCORRECT");
+                }
+              }
+            }
+          }
+          
+          // Si on arrive ici mais qu'il y a toujours une erreur sur current_password,
+          // on peut supposer que c'est un problème de mot de passe (indépendamment de la langue)
+          throw new Error("CURRENT_PASSWORD_INCORRECT");
+        }
+        
+        // Vérifier également dans non_field_errors et les erreurs génériques
+        if (data.non_field_errors) {
+          if (containsText(data.non_field_errors, 
+              "mot de passe", "password", "contraseña", "passwort", 
+              "invalide", "incorrect", "invalid", "incorrecta", "falsch")) {
+            console.log("Détecté: mot de passe actuel incorrect (erreur générique)");
+            throw new Error("CURRENT_PASSWORD_INCORRECT");
+          }
+        }
+        
+        // Vérifier dans detail ou autres champs génériques
+        if (data.detail && containsText(data.detail, 
+            "mot de passe", "password", "contraseña", "passwort", 
+            "invalide", "incorrect", "invalid", "incorrecta", "falsch")) {
+          console.log("Détecté: mot de passe actuel incorrect (dans detail)");
+          throw new Error("CURRENT_PASSWORD_INCORRECT");
+        }
+        
+        // Autres erreurs spécifiques aux champs
+        if (data.new_password) {
+          if (containsText(data.new_password, "court", "short", "kurz", "corta")) {
+            throw new Error("PASSWORD_TOO_SHORT");
+          } else if (containsText(data.new_password, "complexité", "complexity", "komplex", "complejidad")) {
+            throw new Error("PASSWORD_INVALID");
+          }
+        }
+        
+        if (data.non_field_errors && containsText(data.non_field_errors, 
+            "correspond", "match", "coinciden", "übereinstimmen")) {
+          throw new Error("PASSWORDS_DO_NOT_MATCH");
+        }
+        
+        // Erreurs basées sur le code HTTP
+        throw new Error("VALIDATION_ERROR");
+      }
+      
+      // Autres codes d'erreur HTTP
+      if (error.response) {
+        const status = error.response.status;
+        switch (status) {
+          case 401:
+            throw new Error("INVALID_CREDENTIALS");
+          case 403:
+            throw new Error("UNAUTHORIZED");
+          case 500:
+            throw new Error("SERVER_ERROR");
+        }
+      }
+      
+      // Erreur par défaut avec le message brut si disponible
+      const rawMessage = error.response?.data ? JSON.stringify(error.response.data) : error.message;
+      throw new Error(`UNKNOWN_ERROR: ${rawMessage}`);
+    }
+  }
+
+  /**
+   * Gère les erreurs API et extrait les messages d'erreur
+   * @private
+   * @param {Error} error - Erreur Axios
+   * @returns {string} - Message d'erreur formaté
+   */
+  _handleError(error) {
+    // Pour les erreurs d'authentification (401), retourner un code d'erreur neutre
+    if (error.response && error.response.status === 401) {
+      return "INVALID_CREDENTIALS";
+    }
+    
+    // Pour les erreurs de refresh token
+    if (error.message && (
+        error.message.includes('No refresh token available') || 
+        error.message.includes('refresh token') ||
+        error.message.includes('Identifiants invalides'))) {
+      return "INVALID_CREDENTIALS";
+    }
+    
+    // Erreurs de validation (400)
+    if (error.response && error.response.status === 400) {
+      return "MISSING_FIELDS";
+    }
+    
+    // Erreurs serveur (500)
+    if (error.response && error.response.status === 500) {
+      return "SERVER_ERROR";
+    }
+    
+    // Pour les autres erreurs, utiliser le message standard
+    const message = 
+      (error.response && error.response.data && (
+        error.response.data.detail || 
+        JSON.stringify(error.response.data)
+      )) ||
+      error.message ||
+      error.toString();
+    
+    return message;
+  }
+
+  /**
+   * Obtient le profil utilisateur
+   * @returns {Promise} - Réponse API avec les données de profil
+   */
+  async getProfile() {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      const response = await secureApi.get(API_ENDPOINTS.AUTH.PROFILE, { headers });
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Met à jour le profil utilisateur
+   * @param {Object} profileData - Données du profil à mettre à jour
+   * @returns {Promise} - Réponse API avec les données de profil mises à jour
+   */
+  async updateProfile(profileData) {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Ajouter la langue aux données
+      const requestData = {
+        ...profileData,
+        language: currentLanguage
+      };
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      const response = await secureApi.put(API_ENDPOINTS.AUTH.PROFILE, requestData, { headers });
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Télécharge une image de profil
+   * @param {File} imageFile - Le fichier image à télécharger
+   * @returns {Promise} - Réponse API avec les données de profil mises à jour
+   */
+  async uploadProfileImage(imageFile) {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Créer un objet FormData pour envoyer le fichier
+      const formData = new FormData();
+      formData.append('profile_image', imageFile);
+      formData.append('language', currentLanguage);
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage,
+        'Content-Type': 'multipart/form-data'
+      };
+      
+      const response = await secureApi.put(API_ENDPOINTS.AUTH.PROFILE, formData, { 
+        headers,
+        transformRequest: (data) => data  // Empêche axios de transformer le FormData
+      });
+      
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Supprime l'image de profil actuelle
+   * @returns {Promise} - Réponse API avec les données de profil mises à jour
+   */
+  async removeProfileImage() {
+    try {
+      // Déterminer la langue actuelle depuis le localStorage
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      // Créer l'objet de données avec null pour supprimer l'image
+      const requestData = {
+        profile_image: null,
+        language: currentLanguage
+      };
+      
+      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      const response = await secureApi.put(API_ENDPOINTS.AUTH.PROFILE, requestData, { headers });
+      return response.data;
+    } catch (error) {
+      const message = this._handleError(error);
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Change l'adresse email de l'utilisateur (le USERNAME_FIELD)
+   * Cette opération initie une demande de changement qui nécessite une confirmation
+   * via un email envoyé à la nouvelle adresse
+   * @param {Object} emailData - Données de changement d'email (new_email, re_new_email, current_password)
+   * @param {string} token - Token d'accès
+   * @returns {Promise} - Réponse API
+   */
+  async changeEmail(emailData, token) {
+    try {
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      const headers = {
+        'Authorization': `JWT ${token}`,
+        'Accept-Language': currentLanguage
+      };
+      
+      // Ajouter la langue actuelle aux données envoyées au serveur
+      const dataWithLanguage = {
+        ...emailData,
+        language: currentLanguage
+      };
+      
+      console.log("Initiation du processus de changement d'email:", JSON.stringify({
+        ...dataWithLanguage,
+        current_password: '[MASQUÉ]'
+      }));
+      
+      // Vérifier que les champs requis sont présents
+      if (!emailData.new_email || !emailData.re_new_email || !emailData.current_password) {
+        console.error("Données manquantes:", {
+          ...emailData,
+          current_password: emailData.current_password ? '[PRÉSENT]' : '[MANQUANT]'
+        });
+        throw new Error("VALIDATION_ERROR");
+      }
+      
+      // Cette requête n'effectue pas immédiatement le changement d'email
+      // Elle envoie un email de confirmation à la nouvelle adresse
+      const response = await secureApi.post(API_ENDPOINTS.AUTH.SET_EMAIL, dataWithLanguage, { headers });
+      
+      console.log("Réponse de la demande de changement d'email:", response.data);
+      
+      return {
+        ...response.data,
+        status: 'EMAIL_VERIFICATION_SENT',
+        pendingEmail: emailData.new_email
+      };
+    } catch (error) {
+      // Afficher les détails de l'erreur
+      console.error("### DÉTAILS ERREUR CHANGEMENT EMAIL ###");
+      console.error("Status:", error.response?.status);
+      console.error("Message d'erreur:", error.message);
+      
+      if (error.response?.data) {
+        console.error("Response body:", error.response.data);
+        if (typeof error.response.data === 'object') {
+          Object.keys(error.response.data).forEach(key => {
+            console.error(`  ${key}:`, error.response.data[key]);
+          });
+        } else {
+          console.error("  ", error.response.data);
+        }
+      }
+      
+      // Pas de connexion internet
+      if (!navigator.onLine || error.message === 'Network Error') {
+        throw new Error("NETWORK_ERROR");
+      }
+      
+      // Vérification spécifique pour "Mot de passe invalide"
+      if (error.response && error.response.data) {
+        const data = error.response.data;
+        
+        if (data.current_password) {
+          if (data.current_password.some(msg => 
+              typeof msg === 'string' && 
+              (msg.toLowerCase().includes('mot de passe invalide') || 
+               msg.toLowerCase().includes('invalid password')))) {
+            throw new Error("CURRENT_PASSWORD_INCORRECT");
+          }
+        }
+        
+        // Vérifier pour email déjà existant
+        if (data.new_email) {
+          if (data.new_email.some(msg => 
+              typeof msg === 'string' && 
+              (msg.toLowerCase().includes('existe déjà') || 
+               msg.toLowerCase().includes('already exists')))) {
+            throw new Error("EMAIL_ALREADY_EXISTS");
+          }
+        }
+        
+        // Si le message d'erreur est un objet avec une propriété "detail"
+        if (data.detail) {
+          const detailMessage = data.detail;
+          if (typeof detailMessage === 'string') {
+            if (detailMessage.toLowerCase().includes('mot de passe') && 
+                detailMessage.toLowerCase().includes('incorrect')) {
+              throw new Error("CURRENT_PASSWORD_INCORRECT");
+            }
+            if (detailMessage.toLowerCase().includes('déjà utilisée') || 
+                detailMessage.toLowerCase().includes('already exists')) {
+              throw new Error("EMAIL_ALREADY_EXISTS");
+            }
+          }
+        }
+        
+        // Erreurs basées sur le code HTTP
+        const status = error.response.status;
+        switch (status) {
+          case 400:
+            throw new Error("VALIDATION_ERROR");
+          case 401:
+            throw new Error("INVALID_CREDENTIALS");
+          case 403:
+            throw new Error("UNAUTHORIZED");
+          case 500:
+            throw new Error("SERVER_ERROR");
+        }
+      }
+      
+      // Erreur par défaut
+      const rawMessage = error.response?.data ? JSON.stringify(error.response.data) : error.message;
+      throw new Error(`UNKNOWN_ERROR: ${rawMessage}`);
+    }
+  }
+
+  /**
+   * Active le changement d'email après clic sur le lien de confirmation
+   * Cette méthode finalise le changement d'email qui était en attente
+   * @param {Object} activationData - Données d'activation (uid, token, encoded_email, language)
+   * @returns {Promise} - Réponse API
+   */
+  async activateEmailChange(activationData) {
+    try {
+      // Récupérer ou utiliser la langue fournie
+      const currentLanguage = activationData.language || 
+                            localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 
+                            'fr';
+      
+      // Préparer les en-têtes avec la langue
+      const headers = {
+        'Accept-Language': currentLanguage
+      };
+      
+      // Construire l'URL avec les paramètres au lieu d'utiliser le body
+      const url = `${API_ENDPOINTS.AUTH.ACTIVATE_EMAIL_CHANGE}?uid=${activationData.uid}&token=${activationData.token}&encoded_email=${activationData.encoded_email}&language=${currentLanguage}`;
+      
+      console.log("Activation du changement d'email avec:", {
+        uid: activationData.uid,
+        token: activationData.token,
+        encoded_email: activationData.encoded_email,
+        language: currentLanguage
+      });
+      
+      // Appel API pour activer le changement d'email (en utilisant GET au lieu de POST)
+      const response = await secureApi.get(
+        url,
+        { headers }
+      );
+      
+      console.log("Réponse de l'activation du changement d'email:", response.data);
+      
+      return {
+        ...response.data,
+        status: 'EMAIL_CHANGE_ACTIVATED'
+      };
+    } catch (error) {
+      console.error("### DÉTAILS ERREUR ACTIVATION CHANGEMENT EMAIL ###");
+      console.error("Status:", error.response?.status);
+      console.error("Message d'erreur:", error.message);
+      
+      if (error.response?.data) {
+        console.error("Response body:", error.response.data);
+      }
+      
+      // Déterminer le type d'erreur
+      let errorCode = "ACTIVATION_FAILED";
+      
+      if (error.response) {
+        const status = error.response.status;
+        const data = error.response.data;
+        
+        if (status === 400 && data.detail) {
+          if (data.detail.includes('expiré')) {
+            errorCode = "TOKEN_EXPIRED";
+          } else if (data.detail.includes('invalide')) {
+            errorCode = "TOKEN_INVALID";
+          }
+        }
+      }
+      
+      throw new Error(errorCode);
+    }
+  }
+  
+  /**
+   * Vérifie si un changement d'email est en attente d'activation
+   * @returns {Promise} - Réponse API avec les détails du changement en attente
+   */
+  async checkPendingEmailChange(token) {
+    try {
+      const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
+      
+      const headers = {
+        'Authorization': `JWT ${token}`,
+        'Accept-Language': currentLanguage
+      };
+      
+      const response = await secureApi.get(API_ENDPOINTS.AUTH.CHECK_PENDING_EMAIL, { headers });
+      
+      return response.data;
+    } catch (error) {
+      // Une erreur ici n'est pas critique, on peut la logger mais ne pas la propager
+      console.error("Erreur lors de la vérification des changements d'email en attente:", error);
+      return { pending: false };
+    }
+  }
+}
+
+export default new AuthService();
