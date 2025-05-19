@@ -133,7 +133,6 @@ const Login = () => {
         [e.target.name]: valueWithoutSpaces,
       }));
     } else {
-      // Pour le mot de passe, conserve la valeur telle quelle
       setFormData((prev) => ({
         ...prev,
         [e.target.name]: e.target.value,
@@ -167,8 +166,8 @@ const Login = () => {
     e.preventDefault();
     if (validateForm()) {
       const userData = {
-        email: email, // Déjà sans espaces grâce au handleChange
-        password: password.trim(), // On applique trim au mot de passe au moment de l'envoi
+        email: email.replace(/\s/g, ''), // Supprime tous les espaces au moment de l'envoi
+        password: password.trim(),
       };
       dispatch(login(userData));
     }
@@ -176,9 +175,10 @@ const Login = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!email) {
+    const cleanEmail = email.replace(/\s/g, '');
+    if (!cleanEmail) {
       newErrors.email = t('login.errors.emailRequired');
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
+    } else if (!/\S+@\S+\.\S+/.test(cleanEmail)) {
       newErrors.email = t('login.errors.emailInvalid');
     }
     if (!password.trim()) {

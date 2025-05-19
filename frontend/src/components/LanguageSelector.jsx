@@ -4,9 +4,8 @@ import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SUPPORTED_LANGUAGES, STORAGE_KEYS } from '@/utils/config';
-import Flag from 'react-world-flags';
 import axiosInstance from '../api/axiosConfig';
-import i18next from 'i18next';  // Import i18next directement, pas notre instance
+import i18next from 'i18next';
 
 /**
  * Fonction pour changer la langue de l'application
@@ -62,15 +61,9 @@ const LanguageSelector = ({ className = '', showText = true, dropdownAlign = 'ri
   const currentLang = SUPPORTED_LANGUAGES.find(lang => lang.code === currentLanguage) || 
                       SUPPORTED_LANGUAGES.find(lang => lang.code === 'en');
 
-  // Fonction pour obtenir le code ISO du pays à partir du code de langue
-  const getCountryCode = (langCode) => {
-    const countryMap = {
-      en: 'US',
-      fr: 'FR',
-      es: 'ES',
-      de: 'DE'
-    };
-    return countryMap[langCode] || langCode.toUpperCase();
+  // Fonction pour formater le code de langue
+  const formatLangCode = (code) => {
+    return code.toUpperCase();
   };
 
   return (
@@ -84,16 +77,11 @@ const LanguageSelector = ({ className = '', showText = true, dropdownAlign = 'ri
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className={clsx("h-5 w-8 rounded-sm overflow-hidden shadow-sm relative", !showText && "mr-0")}
-              style={{ 
-                boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-                border: "1px solid rgba(0,0,0,0.05)"
-              }}
+              className={clsx("h-5 w-5 text-gray-600", !showText && "mr-0")}
             >
-              <Flag code={getCountryCode(currentLang.code)} className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent opacity-20" 
-                style={{ height: '40%', top: 0 }}
-              />
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+              </svg>
             </motion.div>
           </AnimatePresence>
           
@@ -105,9 +93,9 @@ const LanguageSelector = ({ className = '', showText = true, dropdownAlign = 'ri
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="text-sm font-medium"
+                className="text-sm font-medium tracking-wider"
               >
-                {currentLang.name}
+                {formatLangCode(currentLang.code)}
               </motion.span>
             </AnimatePresence>
           )}
@@ -125,40 +113,35 @@ const LanguageSelector = ({ className = '', showText = true, dropdownAlign = 'ri
       >
         <Menu.Items 
           className={clsx(
-            "absolute z-10 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none",
+            "absolute z-10 mt-2 w-32 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none",
             dropdownAlign === 'left' ? 'left-0' : 'right-0'
           )}
         >
           <div className="py-1">
-            {SUPPORTED_LANGUAGES.map((language) => {
-              const countryCode = getCountryCode(language.code);
-              
-              return (
-                <Menu.Item key={language.code}>
-                  {({ active }) => (
-                    <button
-                      type="button"
-                      className={clsx(
-                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                        'block w-full px-4 py-2 text-left text-sm',
-                        currentLanguage === language.code && 'font-medium bg-blue-50'
-                      )}
-                      onClick={() => changeAppLanguage(language.code)}
-                    >
-                      <div className="flex items-center">
-                        <div className="h-4 w-7 rounded-sm overflow-hidden shadow-sm mr-3 relative">
-                          <Flag code={countryCode} className="h-full w-full object-cover" />
-                          <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent opacity-20" 
-                            style={{ height: '40%', top: 0 }}
-                          />
-                        </div>
-                        <span className="text-sm">{language.name}</span>
+            {SUPPORTED_LANGUAGES.map((language) => (
+              <Menu.Item key={language.code}>
+                {({ active }) => (
+                  <button
+                    type="button"
+                    className={clsx(
+                      active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                      'block w-full px-4 py-2 text-left text-sm',
+                      currentLanguage === language.code && 'font-medium bg-blue-50'
+                    )}
+                    onClick={() => changeAppLanguage(language.code)}
+                  >
+                    <div className="flex items-center">
+                      <div className="h-5 w-5 text-gray-600 mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+                        </svg>
                       </div>
-                    </button>
-                  )}
-                </Menu.Item>
-              );
-            })}
+                      <span className="text-sm font-medium tracking-wider">{formatLangCode(language.code)}</span>
+                    </div>
+                  </button>
+                )}
+              </Menu.Item>
+            ))}
           </div>
         </Menu.Items>
       </Transition>

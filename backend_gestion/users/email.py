@@ -6,6 +6,7 @@ from djoser.email import PasswordChangedConfirmationEmail as BasePasswordChanged
 from django.utils import translation
 from django.utils.encoding import force_str
 from django.template import loader
+from django.utils.translation import gettext as _
 import logging
 from django.conf import settings
 
@@ -496,57 +497,10 @@ class PasswordResetEmail(CustomEmailMixin, BasePasswordResetEmail):
         language = self.get_language_from_context()
         logger.debug(f"PasswordResetEmail.render: Langue identifiée: {language}")
         
-        # Si l'utilisateur est None, créer un message simplifié
+        # Si l'utilisateur est None, ne pas envoyer d'email
         if 'user' not in self.context or self.context['user'] is None:
-            logger.debug("PasswordResetEmail.render: utilisateur None, création d'un message simplifié")
-            
-            # Définir un contenu de base pour l'email
-            with translation.override(language):
-                # Construire le contenu de l'email manuellement au lieu d'utiliser le template qui fait référence à user
-                text_body = _("Bonjour,\n\n")
-                text_body += _("Nous avons reçu une demande de réinitialisation de mot de passe pour cette adresse email, mais nous n'avons pas trouvé de compte associé.\n\n")
-                text_body += _("Si vous souhaitez créer un compte, veuillez vous inscrire sur notre site.\n\n")
-                text_body += _("Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.\n\n")
-                text_body += _("Cordialement,\n")
-                text_body += _("L'équipe de Sputnik")
-                
-                # Contenu HTML simple mais élégant
-                html_body = f"""
-                <!DOCTYPE html>
-                <html lang="{language}">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>{_("Réinitialisation de mot de passe")}</title>
-                    <style>
-                        body {{ font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; }}
-                        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                        h1 {{ color: #2563EB; }}
-                        .footer {{ margin-top: 30px; padding-top: 10px; border-top: 1px solid #eee; font-size: 12px; color: #777; }}
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <h1>{_("Demande de réinitialisation de mot de passe")}</h1>
-                        <p>{_("Bonjour,")}</p>
-                        <p>{_("Nous avons reçu une demande de réinitialisation de mot de passe pour cette adresse email, mais nous n'avons pas trouvé de compte associé.")}</p>
-                        <p>{_("Si vous souhaitez créer un compte, veuillez vous inscrire sur notre site.")}</p>
-                        <p>{_("Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.")}</p>
-                        <div class="footer">
-                            <p>{_("Cordialement,")}<br>{_("L'équipe de Sputnik")}</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-                """
-                
-                # Créer un EmailMultiAlternatives manuellement et le retourner
-                from django.core.mail.message import EmailMultiAlternatives
-                subject = _("Compte inconnu - Demande de réinitialisation de mot de passe")
-                from_email = self.from_email
-                self._email = EmailMultiAlternatives(subject, text_body, from_email)
-                self._email.attach_alternative(html_body, "text/html")
-                return self._email
+            logger.debug("PasswordResetEmail.render: utilisateur None, pas d'envoi d'email")
+            return None
         
         # Sinon, utiliser le comportement standard
         with translation.override(language):
@@ -572,21 +526,16 @@ class PasswordResetEmail(CustomEmailMixin, BasePasswordResetEmail):
         self.context['user_language'] = language
         self.language = language  # Stocker également sur l'instance
         
+        # Si l'utilisateur n'existe pas, ne pas envoyer d'email
+        if 'user' not in self.context or self.context['user'] is None:
+            logger.debug(f"PasswordResetEmail.send: utilisateur None, pas d'envoi d'email pour {to}")
+            return None
+        
         # Activer la langue choisie pendant tout le processus d'envoi de l'email
         with translation.override(language):
             logger.debug(f"PasswordResetEmail.send: langue activée pour envoi: {translation.get_language()}")
-            
-            # Cas spécial pour user=None
-            if 'user' not in self.context or self.context['user'] is None:
-                # L'email est construit dans la méthode render()
-                email_message = self.render()
-                email_message.to = to
-                email_message.send()
-                logger.debug(f"PasswordResetEmail.send: email spécial pour user=None envoyé avec succès en langue {language}")
-            else:
-                # Comportement standard
-                super().send(to, *args, **kwargs)
-                logger.debug(f"PasswordResetEmail.send: email envoyé avec succès en langue {language}")
+            super().send(to, *args, **kwargs)
+            logger.debug(f"PasswordResetEmail.send: email envoyé avec succès en langue {language}")
 
 class CustomPasswordChangedConfirmationEmail(CustomEmailMixin, BasePasswordChangedConfirmationEmail):
     template_name = 'email/password_changed_confirmation_email.html'

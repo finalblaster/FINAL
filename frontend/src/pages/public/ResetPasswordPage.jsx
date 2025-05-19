@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { commonTranslations } from '@/translations/common';
 import useLanguage from '@/hooks/useLanguage';
 import { DEFAULT_LANGUAGE, STORAGE_KEYS } from '@/utils/config';
+import { motion } from 'framer-motion';
 
 // Nom de la page dans différentes langues
 const pageNames = {
@@ -84,6 +85,7 @@ const ResetPasswordPage = () => {
   const { changeLanguage } = useLanguage();
   const [email, setEmail] = useState('');
   const [translations, setTranslations] = useState(frTranslations);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Appliquer la langue stockée ou celle par défaut au chargement de la page
   useEffect(() => {
@@ -151,7 +153,9 @@ const ResetPasswordPage = () => {
   }, [i18n.language]);
 
   const handleChange = (e) => {
-    setEmail(e.target.value);
+    // Supprime tous les espaces pour l'email immédiatement
+    const valueWithoutSpaces = e.target.value.replace(/\s/g, '');
+    setEmail(valueWithoutSpaces);
   };
 
   const dispatch = useDispatch();
@@ -162,10 +166,8 @@ const ResetPasswordPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Appliquer trim() à l'email pour enlever les espaces avant de soumettre
-    const trimmedEmail = email.trim();
-
-    if (trimmedEmail === "") {
+    const cleanEmail = email.replace(/\s/g, '');
+    if (cleanEmail === "") {
       toast.error(translations.errors.emailRequired);
       return;
     }
@@ -175,11 +177,11 @@ const ResetPasswordPage = () => {
     
     // Inclure la langue dans les données utilisateur
     const userData = {
-      email: trimmedEmail,
+      email: cleanEmail,
       language: currentLanguage
     };
 
-    console.log(`Envoi de demande de réinitialisation pour ${trimmedEmail} en langue ${currentLanguage}`);
+    console.log(`Envoi de demande de réinitialisation pour ${cleanEmail} en langue ${currentLanguage}`);
 
     // Déclenche l'action pour réinitialiser le mot de passe
     dispatch(resetPassword(userData));
@@ -188,15 +190,17 @@ const ResetPasswordPage = () => {
   useEffect(() => {
     if (isError) {
       toast.error(message);  // Affichage de l'erreur si l'API retourne une erreur
+      setShowConfirmation(false);
     }
     if (isSuccess) {
       toast.success(translations.successMessage);  // Message de succès
-      navigate("/");  // Redirige vers la page d'accueil après succès
+      setEmail(''); // Réinitialiser le champ email
+      setShowConfirmation(true); // Afficher le message de confirmation
     }
 
     // Réinitialiser l'état de l'authentification pour éviter la persistance d'anciens états
     dispatch(reset());
-  }, [isError, isSuccess, message, navigate, dispatch, translations]);
+  }, [isError, isSuccess, message, dispatch, translations]);
 
   return (
     <>
@@ -250,6 +254,31 @@ const ResetPasswordPage = () => {
                 </span>
               </Button>
             </div>
+            {showConfirmation && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 p-4 bg-green-600 text-white rounded-lg shadow-md"
+              >
+                <div className="flex items-start">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <div>
+                    <p className="font-medium">{translations.successMessage}</p>
+                    <button 
+                      onClick={() => setShowConfirmation(false)} 
+                      className="absolute top-3 right-3 text-white"
+                      aria-label="Fermer"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </form>
         )}
       </AuthLayout>

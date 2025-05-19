@@ -82,6 +82,7 @@ const Register = () => {
 
   const handleChange = (e) => {
     if (e.target.name === 'email') {
+      // Supprime tous les espaces pour l'email immédiatement
       const valueWithoutSpaces = e.target.value.replace(/\s/g, '');
       setFormData((prev) => ({
         ...prev,
@@ -191,10 +192,11 @@ const Register = () => {
       newErrors.last_name = t('register.errors.nameRequired');
     }
 
+    const cleanEmail = email.replace(/\s/g, '');
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!email) {
+    if (!cleanEmail) {
       newErrors.email = t('register.errors.emailRequired');
-    } else if (!emailRegex.test(email)) {
+    } else if (!emailRegex.test(cleanEmail)) {
       newErrors.email = t('register.errors.emailInvalid');
     }
 
@@ -229,7 +231,7 @@ const Register = () => {
       const userData = {
         first_name: first_name.trim(),
         last_name: last_name.trim(),
-        email: email, // Déjà sans espaces grâce au handleChange
+        email: email.replace(/\s/g, ''), // Supprime tous les espaces au moment de l'envoi
         password: password.trim(),
         re_password: re_password.trim(),
         language: currentLanguage // Ajout de la langue actuelle

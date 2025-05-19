@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import translation
+from django.utils.translation import gettext as _
 import logging
 from django.contrib.auth import get_user_model
 from djoser.email import ActivationEmail
@@ -140,20 +141,22 @@ class CustomUserViewSet(UserViewSet):
         with translation.override(language):
             email_instance = PasswordResetEmail(context=context)
             
-            # Si user est None, utiliser l'email fourni dans request.data
+            # Si user est None, retourner un message de confirmation sans envoyer d'email
             if user is None:
                 if 'email' in request.data:
-                    email = request.data.get('email')
-                    email_instance.send(to=[email])
-                    logger.debug(f"CustomUserViewSet.reset_password: email envoyé à {email} (user était None)")
+                    logger.debug(f"CustomUserViewSet.reset_password: utilisateur non trouvé pour {request.data.get('email')}, retour d'un message de confirmation")
+                    return Response({
+                        "detail": _("Si un compte existe avec cette adresse email, vous recevrez un lien de réinitialisation de mot de passe.")
+                    }, status=200)
                 else:
                     logger.error("CustomUserViewSet.reset_password: user est None et pas d'email trouvé dans request.data")
                     return Response({"error": "Email non fourni"}, status=400)
             else:
                 email_instance.send(to=[user.email])
                 logger.debug(f"CustomUserViewSet.reset_password: email envoyé avec langue forcée à {language}")
-        
-        return Response(status=204)
+                return Response({
+                    "detail": _("Si un compte existe avec cette adresse email, vous recevrez un lien de réinitialisation de mot de passe.")
+                }, status=200)
         
     @action(["post"], detail=False)
     def set_password(self, request, *args, **kwargs):
