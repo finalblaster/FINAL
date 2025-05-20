@@ -25,7 +25,7 @@ class UserAdmin(BaseUserAdmin):
         (
             _("Personal Information"),
             {
-                "fields": ('first_name', 'last_name',)
+                "fields": ('first_name', 'last_name', 'phone', 'profile_image',)
             },
         ),
         (

@@ -2,27 +2,28 @@ import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { Link } from 'react-router-dom'
-import { UserCircle } from 'lucide-react'
 import { API_BASE_URL } from '@/utils/config'
+import { useSelector } from 'react-redux'
+import { UserCircle } from 'lucide-react'
 
 const classNames = (...classes) => classes.filter(Boolean).join(' ')
 
 const UserMenu = ({ userInfo, userNavigation }) => {
-  const profileImageUrl = userInfo?.profile_image 
-    ? `${API_BASE_URL}${userInfo.profile_image}` 
-    : null;
-  
+  const { isLoading } = useSelector((state) => state.auth);
   const fullName = `${userInfo?.first_name || ''} ${userInfo?.last_name || ''}`.trim();
 
   return (
     <Menu as="div" className="relative">
       <Menu.Button className="-m-1.5 flex items-center p-1.5 rounded-full hover:bg-gray-50 transition-colors">
         <span className="sr-only">Open user menu</span>
-        {profileImageUrl ? (
+        {userInfo?.profile_image ? (
           <img
             className="h-8 w-8 rounded-full bg-gray-50 object-cover border border-gray-100 shadow-sm"
-            src={profileImageUrl}
+            src={`${API_BASE_URL}${userInfo.profile_image}`}
             alt={fullName}
+            onError={(e) => {
+              e.target.src = null;
+            }}
           />
         ) : (
           <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center border border-gray-100 shadow-sm">

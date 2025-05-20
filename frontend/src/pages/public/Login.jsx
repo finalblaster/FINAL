@@ -7,7 +7,7 @@ import Logo from '@/components/Logo';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '@/components/Spinner';
-import { login, reset, getUserInfo } from '@/features/auth/authSlice';
+import { login, reset, getProfile } from '@/features/auth/authSlice';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -28,45 +28,29 @@ const Login = () => {
   const { email, password } = formData;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isLoading, isError, isSuccess, message } = useSelector((state) => state.auth);
+  const { user, isLoading, isError, isSuccess, message, userInfo } = useSelector((state) => state.auth);
   const currentLanguage = i18n.language;
 
   // Appliquer la langue stockée ou celle par défaut
   useEffect(() => {
-    // Récupérer la langue stockée dans localStorage
     const savedLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE);
     
-    // Si une langue est déjà enregistrée, l'utiliser
     if (savedLanguage) {
       console.log('Restauration de la langue sauvegardée:', savedLanguage);
       changeLanguage(savedLanguage);
-    } 
-    // Sinon, utiliser la langue par défaut
-    else {
+    } else {
       console.log('Aucune langue sauvegardée, utilisation de la langue par défaut:', DEFAULT_LANGUAGE);
       changeLanguage(DEFAULT_LANGUAGE);
     }
   }, [changeLanguage]);
 
-  // Redirection si l'utilisateur est déjà connecté
-  useEffect(() => {
-    if (user && user.access) {
-      // Définir dashboard comme section active lors de la connexion, peu importe la section précédente
-      localStorage.setItem('userActiveSection', 'dashboard');
-      dispatch(getUserInfo());
-      navigate('/home');
-    }
-  }, [user, dispatch, navigate]);
-
   useEffect(() => {
     if (isError) {
-      // Gérer toutes les erreurs d'authentification
       if (message === 'INVALID_CREDENTIALS' || 
           message.includes('401') || 
           message.includes('no refresh token available') || 
           message.includes('unauthorized') || 
           message.includes('invalid')) {
-        // Utiliser la clé de traduction pour le message d'erreur
         const errorMessage = t('login.errors.invalidCredentials');
         toast.error(errorMessage);
         setErrors({
@@ -85,7 +69,6 @@ const Login = () => {
           general: errorMessage,
         });
       } else {
-        // Autres types d'erreurs
         toast.error(message);
         setErrors({
           general: message,
@@ -102,7 +85,6 @@ const Login = () => {
   // Vérifier si l'utilisateur vient de s'inscrire
   useEffect(() => {
     if (location.state?.fromRegister) {
-      // Préremplir l'email si disponible
       if (location.state.email) {
         setFormData(prev => ({
           ...prev,
@@ -110,23 +92,19 @@ const Login = () => {
         }));
       }
       
-      // Afficher l'alerte visuelle
       setShowVerificationAlert(true);
       
-      // Afficher également un toast
       toast.info(t('login.verificationEmailSent'), {
         autoClose: 8000,
         position: "top-center"
       });
       
-      // Nettoyer l'état de localisation pour éviter d'afficher le message à nouveau lors d'un rafraîchissement
       window.history.replaceState({}, document.title);
     }
   }, [location.state, t]);
 
   const handleChange = (e) => {
     if (e.target.name === 'email') {
-      // Supprime tous les espaces pour l'email immédiatement
       const valueWithoutSpaces = e.target.value.replace(/\s/g, '');
       setFormData((prev) => ({
         ...prev,
@@ -141,7 +119,6 @@ const Login = () => {
   };
 
   const handleClick = (e, to) => {
-    // Ne traiter que les liens internes (ancres)
     if (to && to.startsWith('#')) {
       e.preventDefault();
       
@@ -149,11 +126,9 @@ const Login = () => {
       const targetElement = document.getElementById(targetId);
       
       if (targetElement) {
-        // Position de l'élément avec offset
         const yOffset = -80; 
         const y = targetElement.getBoundingClientRect().top + window.pageYOffset + yOffset + 90;
         
-        // Défilement
         window.scrollTo({
           top: y,
           behavior: 'smooth'
@@ -162,16 +137,30 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       const userData = {
-        email: email.replace(/\s/g, ''), // Supprime tous les espaces au moment de l'envoi
+        email: email.replace(/\s/g, ''),
         password: password.trim(),
       };
-      dispatch(login(userData));
+      try {
+        await dispatch(login(userData)).unwrap();
+        await dispatch(getProfile()).unwrap();
+        // NE PAS naviguer ici
+      } catch (error) {
+        console.error('Login error:', error);
+        toast.error(t('login.errors.loginFailed'));
+      }
     }
   };
+
+  // Redirige dès que userInfo est bien chargé
+  useEffect(() => {
+    if (user && userInfo && userInfo.email) {
+      navigate('/home');
+    }
+  }, [user, userInfo, navigate]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -209,7 +198,6 @@ const Login = () => {
     }
   };
 
-  // Custom Link component that uses our handleClick function
   const CustomLink = ({ to, children, className }) => (
     <Link 
       to={to} 
@@ -220,13 +208,10 @@ const Login = () => {
     </Link>
   );
 
-  // Get the correct button label based on the language
   const getSubmitButtonLabel = () => {
-    // For French, use loginButton key
     if (currentLanguage === 'fr') {
       return t('login.loginButton');
     }
-    // For other languages, use submitButton key
     return t('login.submitButton');
   };
 
@@ -235,7 +220,6 @@ const Login = () => {
       <Helmet>
         <title>{t('login.pageTitle')}</title>
       </Helmet>
-      {/* Formulaire de connexion */}
       <AuthLayout>
         <motion.div 
           variants={containerVariants}
@@ -249,9 +233,6 @@ const Login = () => {
             </CustomLink>
           </motion.div>
           
-          {/* Alerte de vérification d'email */}
-
-          
           <motion.div variants={itemVariants} className="mt-20">
             <h2 className="text-lg font-semibold text-gray-900">{t('login.title')}</h2>
             <p className="mt-2 text-sm text-gray-700">
@@ -263,15 +244,12 @@ const Login = () => {
             </p>
           </motion.div>
         </motion.div>
-        {/* Formulaire avec Overlay Spinner */}
         <div className="relative">
-          {/* Affichage du Spinner si isLoading est vrai */}
           {isLoading && (
             <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-50 z-10">
               <Spinner loading={isLoading} />
             </div>
           )}
-          {/* Formulaire qui sera masqué par le Spinner */}
           <motion.form 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -309,7 +287,6 @@ const Login = () => {
             </div>
           </motion.form>
         </div>
-        {/* Lien mot de passe oublié */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -321,30 +298,30 @@ const Login = () => {
           </CustomLink>
         </motion.div>
         {showVerificationAlert && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-6 p-4 bg-green-600 text-white rounded-lg shadow-md"
-            >
-              <div className="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <div>
-                  <p className="font-medium">{t('login.verificationEmailSent')}</p>
-                  <button 
-                    onClick={() => setShowVerificationAlert(false)} 
-                    className="absolute top-3 right-3 text-white"
-                    aria-label="Fermer"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6 p-4 bg-green-600 text-white rounded-lg shadow-md"
+          >
+            <div className="flex items-start">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <div>
+                <p className="font-medium">{t('login.verificationEmailSent')}</p>
+                <button 
+                  onClick={() => setShowVerificationAlert(false)} 
+                  className="absolute top-3 right-3 text-white"
+                  aria-label="Fermer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
               </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
+        )}
       </AuthLayout>
     </>
   );

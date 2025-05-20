@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { logout, reset, setActiveSection, getUserInfo } from '@/features/auth/authSlice';
+import { logout, reset, setActiveSection, getProfile } from '@/features/auth/authSlice';
 import { Header } from '@/pages/user/Header';
 import { MobileSidebar } from '@/pages/user/MobileSideBar';
 import { DesktopSidebar } from '@/pages/user/DesktopSideBar';
@@ -65,7 +65,7 @@ export default function HomeUser() {
   // Récupérer les infos utilisateur au chargement
   useEffect(() => {
     if (user?.access) {
-      dispatch(getUserInfo());
+      dispatch(getProfile());
     }
   }, [dispatch, user?.access]);
 
