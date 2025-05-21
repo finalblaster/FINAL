@@ -150,42 +150,13 @@ export const login = createAsyncThunk(
     async (userData, thunkAPI) => {
         try {
             const response = await authService.login(userData);
-            return response;  // Retourne la réponse de l'API si tout se passe bien
+            return response;
         } catch (error) {
-            let message = '';
-            if (error.response) {
-                const status = error.response.status;
-
-                // Gestion des erreurs spécifiques basées sur le statut HTTP
-                switch (status) {
-                    case 401:
-                        // 401 Unauthorized - Identifiants incorrects
-                        // Utiliser un code d'erreur neutre au lieu d'un message en français
-                        message = 'INVALID_CREDENTIALS';
-                        break;
-                    case 400:
-                        // 400 Bad Request - Erreur de validation (champ requis manquant)
-                        message = 'MISSING_FIELDS';
-                        break;
-                    case 500:
-                        // 500 Internal Server Error - Erreur serveur
-                        message = 'SERVER_ERROR';
-                        break;
-                    default:
-                        // Autres erreurs HTTP génériques
-                        message = error.response.data?.detail || 'UNKNOWN_ERROR';
-                        break;
-                }
-            } else if (error.message) {
-                // Autres erreurs réseau ou de connexion
-                message = error.message;  // Par exemple : "Network Error"
-            } else {
-                // Erreur inconnue
-                message = 'UNKNOWN_ERROR';
+            // Si c'est un compte inactif, on propage l'erreur
+            if (error.message === 'INACTIVE_ACCOUNT') {
+                return thunkAPI.rejectWithValue('INACTIVE_ACCOUNT');
             }
-
-            // Retourner l'erreur à l'état Redux pour l'afficher
-            return thunkAPI.rejectWithValue(message);
+            return thunkAPI.rejectWithValue(error.message);
         }
     }
 );

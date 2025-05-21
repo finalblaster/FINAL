@@ -315,7 +315,24 @@ export const authTranslations = Object.assign({
     youCan: 'Vous pouvez',
     logIn: 'vous connecter',
     or: 'ou',
-    resetPassword: 'réinitialiser votre mot de passe'
+    resetPassword: 'réinitialiser votre mot de passe',
+    resetPasswordConfirm: {
+      pageTitle: 'Réinitialiser le mot de passe - {{siteName}}',
+      title: 'Réinitialiser votre mot de passe',
+      subtitle: 'Entrez votre nouveau mot de passe ci-dessous.',
+      newPasswordLabel: 'Nouveau mot de passe',
+      confirmPasswordLabel: 'Confirmez votre mot de passe',
+      submitButton: 'Confirmer le mot de passe',
+      successMessage: 'Votre mot de passe a été réinitialisé avec succès.',
+      errors: {
+        passwordRequired: 'Le mot de passe est requis',
+        passwordLength: 'Le mot de passe doit contenir au moins 8 caractères',
+        passwordComplexity: 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial',
+        confirmPasswordRequired: 'La confirmation du mot de passe est requise',
+        passwordsDoNotMatch: 'Les mots de passe ne correspondent pas',
+        genericError: 'Une erreur est survenue. Veuillez réessayer.',
+      },
+    },
   },
   es: {
     emailVerification: {
@@ -386,7 +403,24 @@ export const authTranslations = Object.assign({
     youCan: 'Puede',
     logIn: 'iniciar sesión',
     or: 'o',
-    resetPassword: 'restablecer su contraseña'
+    resetPassword: 'restablecer su contraseña',
+    resetPasswordConfirm: {
+      pageTitle: 'Restablecer Contraseña - {{siteName}}',
+      title: 'Restablecer su contraseña',
+      subtitle: 'Ingrese su nueva contraseña a continuación.',
+      newPasswordLabel: 'Nueva contraseña',
+      confirmPasswordLabel: 'Confirme su contraseña',
+      submitButton: 'Confirmar contraseña',
+      successMessage: 'Su contraseña ha sido restablecida con éxito.',
+      errors: {
+        passwordRequired: 'La contraseña es requerida',
+        passwordLength: 'La contraseña debe tener al menos 8 caracteres',
+        passwordComplexity: 'La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial',
+        confirmPasswordRequired: 'La confirmación de la contraseña es requerida',
+        passwordsDoNotMatch: 'Las contraseñas no coinciden',
+        genericError: 'Ha ocurrido un error. Por favor, inténtelo de nuevo.',
+      },
+    },
   },
   de: {
     emailVerification: {
@@ -457,7 +491,24 @@ export const authTranslations = Object.assign({
     youCan: 'Sie können',
     logIn: 'sich anmelden',
     or: 'oder',
-    resetPassword: 'Ihr Passwort zurücksetzen'
+    resetPassword: 'Ihr Passwort zurücksetzen',
+    resetPasswordConfirm: {
+      pageTitle: 'Passwort zurücksetzen - {{siteName}}',
+      title: 'Setzen Sie Ihr Passwort zurück',
+      subtitle: 'Geben Sie unten Ihr neues Passwort ein.',
+      newPasswordLabel: 'Neues Passwort',
+      confirmPasswordLabel: 'Bestätigen Sie Ihr Passwort',
+      submitButton: 'Passwort bestätigen',
+      successMessage: 'Ihr Passwort wurde erfolgreich zurückgesetzt.',
+      errors: {
+        passwordRequired: 'Passwort ist erforderlich',
+        passwordLength: 'Das Passwort muss mindestens 8 Zeichen lang sein',
+        passwordComplexity: 'Das Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten',
+        confirmPasswordRequired: 'Passwortbestätigung ist erforderlich',
+        passwordsDoNotMatch: 'Passwörter stimmen nicht überein',
+        genericError: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.',
+      },
+    }
   }
 }
 );

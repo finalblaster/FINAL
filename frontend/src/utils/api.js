@@ -83,15 +83,7 @@ secureApiInstance.interceptors.request.use(
     
     // Si un token existe, l'ajouter à l'en-tête d'autorisation
     if (token) {
-      // Si l'en-tête d'autorisation est déjà défini dans config.headers, ne pas le remplacer
-      if (!config.headers.Authorization) {
-        config.headers.Authorization = `JWT ${token}`;
-        console.log("Token ajouté automatiquement:", `JWT ${token}`);
-      } else {
-        console.log("En-tête d'autorisation déjà présent:", config.headers.Authorization);
-      }
-    } else {
-      console.warn("Aucun token trouvé dans localStorage");
+      config.headers.Authorization = `Bearer ${token}`;
     }
     
     // Ajouter la langue courante à chaque requête si elle n'est pas déjà spécifiée
@@ -100,84 +92,51 @@ secureApiInstance.interceptors.request.use(
       config.headers['Accept-Language'] = currentLanguage;
     }
     
-    console.log("Configuration finale de la requête:", {
-      url: config.url,
-      method: config.method,
-      headers: config.headers,
-      data: config.data
-    });
-    
     return config;
   },
   (error) => {
-    console.error('Erreur dans la configuration de la requête:', error);
     return Promise.reject(error);
   }
 );
 
 // Ajout d'un intercepteur pour les réponses
 secureApiInstance.interceptors.response.use(
-  (response) => {
-    // Traitement de la réponse réussie
-    return response;
-  },
+  (response) => response,
   async (error) => {
-    // Gestion des erreurs de réponse
     const originalRequest = error.config;
     
-    // Vérifier si l'erreur est due à un token expiré (401)
-    if (
-      error.response &&
-      error.response.status === 401 &&
-      !originalRequest._retry
-    ) {
+    // Si erreur 401 (non autorisé) et que la requête n'a pas déjà été retentée
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+      
       try {
-        // Tenter de rafraîchir le token
         const userData = getUserData();
-        const refreshToken = userData?.refresh;
-        
-        if (!refreshToken) {
-          // Si pas de refresh token, déconnecter l'utilisateur
-          clearUserData();
-          throw new Error('INVALID_CREDENTIALS');
-        }
-        
-        // Appel à l'API pour obtenir un nouveau token
-        const response = await axios.post(
-          `${API_CONFIG.BACKEND_DOMAIN}/api/v1/auth/jwt/refresh/`,
-          { refresh: refreshToken }
-        );
-        
-        const newToken = response.data.access;
-        
-        if (newToken) {
+        if (userData?.refresh) {
+          // Utiliser l'endpoint JWT refresh
+          const response = await axios.post(
+            `${API_CONFIG.BACKEND_DOMAIN}/api/v1/auth/jwt/refresh/`,
+            { refresh: userData.refresh }
+          );
+          
+          const newToken = response.data.access;
+          
           // Mettre à jour le token dans localStorage
           userData.access = newToken;
           localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
           
           // Mettre à jour le header de la requête originale
-          originalRequest.headers.Authorization = `JWT ${newToken}`;
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
           
           // Répéter la requête originale avec le nouveau token
           return secureApiInstance(originalRequest);
-        } else {
-          // Déconnecter l'utilisateur si le rafraîchissement échoue
-          clearUserData();
-          throw new Error('Token refresh failed');
         }
       } catch (refreshError) {
-        // En cas d'échec de rafraîchissement du token, déconnecter l'utilisateur
+        // En cas d'échec de rafraîchissement, déconnecter l'utilisateur
         clearUserData();
-        console.error('Error refreshing token:', refreshError);
-        
-        // Remplacer l'erreur technique par un code d'erreur neutre
-        const userError = new Error("INVALID_CREDENTIALS");
-        return Promise.reject(userError);
+        return Promise.reject(new Error('INVALID_CREDENTIALS'));
       }
     }
     
-    // Si ce n'est pas une erreur 401 ou si le rafraîchissement a échoué
     return Promise.reject(error);
   }
 );

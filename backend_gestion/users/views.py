@@ -6,7 +6,7 @@ from rest_framework import status
 from django.utils import translation
 from django.utils.translation import gettext as _
 import logging
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from djoser.email import ActivationEmail
 from djoser.views import UserViewSet
 from rest_framework.views import APIView
@@ -914,4 +914,92 @@ def activate_email_change(request):
         return Response(
             {'error': 'Erreur lors de l\'activation du changement d\'email'}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login(request):
+    email = request.data.get('email')
+    password = request.data.get('password')
+    
+    if not email or not password:
+        return Response(
+            {'detail': _('Veuillez fournir un email et un mot de passe.')},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        user = User.objects.get(email=email)
+        
+        # Vérifier si l'utilisateur existe mais n'est pas actif
+        if not user.is_active:
+            # Générer le token d'activation avec Django
+            from django.utils.http import urlsafe_base64_encode
+            from django.utils.encoding import force_bytes
+            from django.contrib.auth.tokens import default_token_generator
+            from django.core.mail import EmailMessage
+            from django.template.loader import render_to_string
+            from bs4 import BeautifulSoup
+            
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            
+            # Préparation du contexte pour l'email
+            context = {
+                'user': user,
+                'domain': settings.DOMAIN,
+                'site_name': settings.SITE_NAME,
+                'protocol': 'https' if request.is_secure() else 'http',
+                'url': f'users/activation/{uid}/{token}/',
+                'current_language': getattr(request, '_user_language', 'fr')
+            }
+            
+            try:
+                # Rendre le template HTML
+                html_body = render_to_string('email/activation_email.html', context)
+                
+                # Extraire uniquement la partie HTML
+                soup = BeautifulSoup(html_body, 'html.parser')
+                html_content = str(soup.find('html'))
+                
+                # Extraire le sujet du template
+                subject = soup.title.string if soup.title else f"{settings.SITE_NAME} - {_('Confirmez votre adresse email')}"
+                
+                # Créer le message email avec uniquement le contenu HTML
+                email = EmailMessage(
+                    subject=subject,
+                    body=html_content,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[user.email]
+                )
+                email.content_subtype = "html"  # Définir le type de contenu comme HTML
+                
+                # Envoyer l'email
+                email.send()
+                logger.info(f"Email d'activation envoyé à {user.email}")
+                
+                return Response(
+                    {
+                        'detail': _('Un email d\'activation a été envoyé à votre adresse email.'),
+                        'status': 'INACTIVE_ACCOUNT'
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            except Exception as e:
+                logger.error(f"Erreur lors de l'envoi de l'email d'activation: {str(e)}")
+                return Response(
+                    {'detail': _('Une erreur est survenue lors de l\'envoi de l\'email d\'activation.')},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        
+        # Si l'utilisateur est actif, laisser JWT gérer l'authentification
+        return Response(
+            {'detail': _('Veuillez utiliser l\'endpoint JWT pour l\'authentification.')},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    except User.DoesNotExist:
+        return Response(
+            {'detail': _('Aucun compte n\'a été trouvé avec cet email.')},
+            status=status.HTTP_401_UNAUTHORIZED
         )
