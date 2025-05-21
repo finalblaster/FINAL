@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import AuthLayout from '@/components/AuthLayout';
 import Button from '@/components/Button';
-import { TextField } from '@/components/Fields';
+import FormField from '@/components/FormField';
+import PasswordField from '@/components/PasswordField';
 import Logo from '@/components/Logo';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +23,7 @@ const Login = () => {
     password: '',
   });
   const [errors, setErrors] = useState({});
+  const [generalError, setGeneralError] = useState('');
   const location = useLocation();
   const [showVerificationAlert, setShowVerificationAlert] = useState(false);
 
@@ -56,29 +58,37 @@ const Login = () => {
         setErrors({
           general: errorMessage,
         });
+        setGeneralError('');
       } else if (message === 'MISSING_FIELDS') {
         const errorMessage = t('login.errors.allFieldsRequired');
         toast.error(errorMessage);
         setErrors({
           general: errorMessage,
         });
+        setGeneralError('');
       } else if (message === 'SERVER_ERROR') {
         const errorMessage = t('login.errors.serverError');
         toast.error(errorMessage);
         setErrors({
           general: errorMessage,
         });
+        setGeneralError('');
+      } else if (message === 'NETWORK_ERROR') {
+        setGeneralError(t('login.errors.networkError'));
+        setErrors({});
       } else {
         toast.error(message);
         setErrors({
           general: message,
         });
+        setGeneralError('');
       }
       dispatch(reset());
     }
     if (isSuccess) {
       toast.success(t('login.successMessage'));
       setFormData({ email: '', password: '' });
+      setGeneralError('');
     }
   }, [isError, isSuccess, message, dispatch, t]);
 
@@ -243,6 +253,26 @@ const Login = () => {
               {t('login.forTrial')}
             </p>
           </motion.div>
+          {generalError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-8 mb-6 p-4 bg-red-600 text-white rounded-lg shadow-md relative"
+            >
+              <div className="flex items-start">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2"/>
+                  <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                </svg>
+                <div>
+                  <p className="font-medium">
+                    {generalError}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
         <div className="relative">
           {isLoading && (
@@ -257,7 +287,7 @@ const Login = () => {
             className="mt-10 grid grid-cols-1 gap-y-8" 
             onSubmit={handleSubmit}
           >
-            <TextField
+            <FormField
               label={t('login.emailLabel')}
               id="email"
               name="email"
@@ -268,18 +298,18 @@ const Login = () => {
               error={errors.email}
               placeholder=""
             />
-            <TextField
-              label={t('login.passwordLabel')}
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              onChange={handleChange}
-              value={password}
-              error={errors.password || errors.general}
-              showPasswordToggle
-              placeholder=""
-            />
+            <div>
+              <PasswordField
+                label={t('login.passwordLabel')}
+                id="password"
+                name="password"
+                value={password}
+                onChange={handleChange}
+                error={errors.password || errors.general}
+                autoComplete="current-password"
+                showStrengthMeter={false}
+              />
+            </div>
             <div>
               <Button type="submit" variant="solid" color="blue" className="w-full hover-scale tap-effect">
                 {getSubmitButtonLabel()}

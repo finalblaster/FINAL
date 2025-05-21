@@ -400,39 +400,122 @@ class AuthService {
    * @returns {string} - Message d'erreur formaté
    */
   _handleError(error) {
-    // Pour les erreurs d'authentification (401), retourner un code d'erreur neutre
-    if (error.response && error.response.status === 401) {
-      return "INVALID_CREDENTIALS";
+    // Afficher les détails de l'erreur pour le debugging
+    console.error("### DÉTAILS ERREUR ###");
+    console.error("Status:", error.response?.status);
+    console.error("Message d'erreur:", error.message);
+    
+    if (error.response?.data) {
+      console.error("Response body:", error.response.data);
     }
-    
-    // Pour les erreurs de refresh token
-    if (error.message && (
-        error.message.includes('No refresh token available') || 
-        error.message.includes('refresh token') ||
-        error.message.includes('Identifiants invalides'))) {
-      return "INVALID_CREDENTIALS";
+
+    // Si l'erreur est déjà un message d'erreur formaté, le retourner tel quel
+    if (typeof error.message === 'string' && [
+      'INVALID_CREDENTIALS',
+      'EMAIL_ALREADY_EXISTS',
+      'CURRENT_PASSWORD_INCORRECT',
+      'VALIDATION_ERROR',
+      'TOO_MANY_ATTEMPTS',
+      'SERVER_ERROR',
+      'NETWORK_ERROR',
+      'UNKNOWN_ERROR'
+    ].includes(error.message)) {
+      return error.message;
     }
-    
-    // Erreurs de validation (400)
-    if (error.response && error.response.status === 400) {
-      return "MISSING_FIELDS";
+
+    // Pas de connexion internet
+    if (!navigator.onLine || error.message === 'Network Error') {
+      return "NETWORK_ERROR";
     }
-    
-    // Erreurs serveur (500)
-    if (error.response && error.response.status === 500) {
-      return "SERVER_ERROR";
+
+    // Gestion des erreurs HTTP
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data;
+
+      // Vérifier les erreurs spécifiques dans la réponse
+      if (data) {
+        // Vérifier si l'email existe déjà
+        if (data.email && Array.isArray(data.email)) {
+          for (const msg of data.email) {
+            if (typeof msg === 'string' && 
+                (msg.toLowerCase().includes('existe déjà') || 
+                 msg.toLowerCase().includes('already exists'))) {
+              return "EMAIL_ALREADY_EXISTS";
+            }
+          }
+        }
+
+        // Vérifier les erreurs de mot de passe
+        if (data.current_password && Array.isArray(data.current_password)) {
+          for (const msg of data.current_password) {
+            if (typeof msg === 'string' && 
+                (msg.toLowerCase().includes('mot de passe invalide') || 
+                 msg.toLowerCase().includes('invalid password'))) {
+              return "CURRENT_PASSWORD_INCORRECT";
+            }
+          }
+        }
+
+        // Vérifier dans detail ou autres champs génériques
+        if (data.detail && typeof data.detail === 'string') {
+          const detail = data.detail.toLowerCase();
+          if (detail.includes('existe déjà') || detail.includes('already exists')) {
+            return "EMAIL_ALREADY_EXISTS";
+          }
+          if (detail.includes('mot de passe invalide') || detail.includes('invalid password')) {
+            return "CURRENT_PASSWORD_INCORRECT";
+          }
+          if (detail.includes('incorrect') || detail.includes('invalid')) {
+            return "INVALID_CREDENTIALS";
+          }
+        }
+
+        // Vérifier les erreurs non_field_errors
+        if (data.non_field_errors && Array.isArray(data.non_field_errors)) {
+          for (const msg of data.non_field_errors) {
+            if (typeof msg === 'string') {
+              const lowerMsg = msg.toLowerCase();
+              if (lowerMsg.includes('incorrect') || 
+                  lowerMsg.includes('invalid') || 
+                  lowerMsg.includes('incorrecte') || 
+                  lowerMsg.includes('invalide')) {
+                return "INVALID_CREDENTIALS";
+              }
+            }
+          }
+        }
+      }
+
+      // Gestion des codes HTTP
+      switch (status) {
+        case 401:
+          return "INVALID_CREDENTIALS";
+        case 400:
+          // Si c'est une erreur 400 mais qu'on n'a pas trouvé de message spécifique
+          return "VALIDATION_ERROR";
+        case 429:
+          return "TOO_MANY_ATTEMPTS";
+        case 500:
+          return "SERVER_ERROR";
+        default:
+          return "UNKNOWN_ERROR";
+      }
     }
-    
-    // Pour les autres erreurs, utiliser le message standard
-    const message = 
-      (error.response && error.response.data && (
-        error.response.data.detail || 
-        JSON.stringify(error.response.data)
-      )) ||
-      error.message ||
-      error.toString();
-    
-    return message;
+
+    // Si le message d'erreur contient des mots-clés spécifiques
+    if (typeof error.message === 'string') {
+      const lowerMsg = error.message.toLowerCase();
+      if (lowerMsg.includes('incorrect') || 
+          lowerMsg.includes('invalid') || 
+          lowerMsg.includes('incorrecte') || 
+          lowerMsg.includes('invalide')) {
+        return "INVALID_CREDENTIALS";
+      }
+    }
+
+    // Erreur par défaut
+    return "UNKNOWN_ERROR";
   }
 
   /**

@@ -33,6 +33,8 @@ export const authTranslations = Object.assign({
         invalidCredentials: 'Invalid email or password',
         allFieldsRequired: 'All fields are required',
         serverError: 'Server error, please try again later',
+        networkError: 'Connection problem. Please try again later.',
+        validationError: 'Please check your input and try again',
       },
     },
     resetPassword: {
@@ -77,7 +79,7 @@ export const authTranslations = Object.assign({
           emailExistsSuggestion: 'You can log in or reset your password if you forgot it',
           invalidCredentials: 'Invalid email or password',
           serverError: 'An error occurred. Please try again later',
-          networkError: 'Network error. Please check your connection',
+          networkError: 'Connection problem. Please try again later.',
           validationError: 'Please check your input and try again',
           tooManyAttempts: 'Too many attempts. Please try again later'
         }
@@ -194,6 +196,8 @@ export const authTranslations = Object.assign({
         tooManyAttempts: 'Trop de tentatives. Veuillez réessayer dans {{time}} minutes',
         serverError: 'Une erreur s\'est produite. Veuillez réessayer plus tard',
         allFieldsRequired: 'Tous les champs sont obligatoires',
+        networkError: 'Problème de connexion. Réessayez plus tard.',
+        validationError: 'Veuillez vérifier vos informations et réessayer',
       }
     },
     resetPassword: {
@@ -210,7 +214,8 @@ export const authTranslations = Object.assign({
         emailInvalid: 'Veuillez entrer une adresse email valide',
         accountNotFound: 'Aucun compte trouvé avec cette adresse email',
         tooManyRequests: 'Trop de tentatives. Veuillez réessayer plus tard',
-        serverError: 'Une erreur s\'est produite. Veuillez réessayer plus tard'
+        serverError: 'Une erreur s\'est produite. Veuillez réessayer plus tard',
+        networkError: 'Problème de connexion. Réessayez plus tard.',
       }
     },
     register: {
@@ -253,7 +258,7 @@ export const authTranslations = Object.assign({
           emailExistsSuggestion: 'Vous pouvez vous connecter ou réinitialiser votre mot de passe si vous l\'avez oublié',
           invalidCredentials: 'Adresse email ou mot de passe incorrect',
           serverError: 'Une erreur s\'est produite. Veuillez réessayer plus tard',
-          networkError: 'Erreur de réseau. Veuillez vérifier votre connexion',
+          networkError: 'Problème de connexion. Réessayez plus tard.',
           validationError: 'Veuillez vérifier vos informations et réessayer',
           tooManyAttempts: 'Trop de tentatives. Veuillez réessayer plus tard'
         }
@@ -273,7 +278,8 @@ export const authTranslations = Object.assign({
         emailInvalid: 'L\'adresse email n\'est pas valide',
         userNotFound: 'Aucun utilisateur trouvé avec cette adresse email',
         tooManyRequests: 'Trop de tentatives. Veuillez réessayer plus tard',
-        serverError: 'Une erreur s\'est produite. Veuillez réessayer plus tard'
+        serverError: 'Une erreur s\'est produite. Veuillez réessayer plus tard',
+        networkError: 'Problème de connexion. Réessayez plus tard.',
       }
     },
     accountActivation: {
@@ -342,7 +348,9 @@ export const authTranslations = Object.assign({
         passwordRequired: 'La contraseña es obligatoria',
         invalidCredentials: 'Correo electrónico o contraseña inválidos',
         allFieldsRequired: 'Todos los campos son obligatorios',
-        serverError: 'Error del servidor, inténtelo de nuevo más tarde',
+        serverError: 'Se ha producido un error. Por favor, inténtelo de nuevo.',
+        networkError: 'Problema de conexión. Inténtalo de nuevo más tarde.',
+        validationError: 'Por favor revisa tus datos e inténtalo de nuevo',
       },
     },
     accountActivation: {
@@ -411,7 +419,9 @@ export const authTranslations = Object.assign({
         passwordRequired: 'Passwort ist erforderlich',
         invalidCredentials: 'Ungültige E-Mail oder Passwort',
         allFieldsRequired: 'Alle Felder sind erforderlich',
-        serverError: 'Serverfehler, bitte versuchen Sie es später noch einmal',
+        serverError: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.',
+        networkError: 'Verbindungsproblem. Bitte versuchen Sie es später erneut.',
+        validationError: 'Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut',
       },
     },
     accountActivation: {

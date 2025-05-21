@@ -6,7 +6,8 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import AuthLayout from '@/components/AuthLayout';
 import Button from '@/components/Button';
-import { TextField } from '@/components/Fields';
+import FormField from '@/components/FormField';
+import PasswordField from '@/components/PasswordField';
 import Logo from '@/components/Logo';
 import { register, reset } from '@/features/auth/authSlice';
 import Spinner from '@/components/Spinner';
@@ -32,6 +33,8 @@ const Register = () => {
     password: '',
     re_password: '',
   });
+
+  const [generalError, setGeneralError] = useState('');
 
   // Appliquer la langue stockée ou celle par défaut
   useEffect(() => {
@@ -244,23 +247,29 @@ const Register = () => {
 
   useEffect(() => {
     if (isError) {
-      console.log('Error in Register component:', message);
-      
-      // Gestion des erreurs spécifiques du serveur
-      if (message.includes('email already exists') || message.includes('email')) {
-        toast.error(t('register.errors.serverErrors.emailExists'));
+      if (message === 'EMAIL_ALREADY_EXISTS') {
         setErrors(prev => ({
           ...prev,
           email: t('register.errors.serverErrors.emailExists')
         }));
-      } else if (message.includes('Network Error')) {
-        toast.error(t('register.errors.serverErrors.networkError'));
-      } else if (message.includes('validation error')) {
-        toast.error(t('register.errors.serverErrors.validationError'));
-      } else if (message.includes('too many attempts')) {
-        toast.error(t('register.errors.serverErrors.tooManyAttempts'));
+        setGeneralError('');
+      } else if (message === 'NETWORK_ERROR') {
+        setGeneralError(t('register.errors.serverErrors.networkError'));
+      } else if (typeof message === 'object' && message !== null) {
+        // message = { email: ["already exists"], password: ["too short"] }
+        const fieldErrors = {};
+        Object.entries(message).forEach(([key, value]) => {
+          fieldErrors[key] = Array.isArray(value) ? value[0] : value;
+        });
+        setErrors(prev => ({
+          ...prev,
+          ...fieldErrors
+        }));
+        setGeneralError('');
+        const firstError = Object.values(fieldErrors)[0];
+        // toast.error(firstError); // toast supprimé
       } else {
-        toast.error(t('register.errors.serverErrors.serverError'));
+        setGeneralError(message);
       }
       dispatch(reset());
     }
@@ -323,6 +332,29 @@ const Register = () => {
           </motion.div>
         </motion.div>
 
+        {/* Affichage de l'erreur général au-dessus du formulaire, style alerte info rouge */}
+        {generalError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 mb-6 p-4 bg-red-600 text-white rounded-lg shadow-md relative"
+          >
+            <div className="flex items-start">
+              {/* Icône info simple */}
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2"/>
+                <circle cx="12" cy="16" r="1" fill="currentColor"/>
+              </svg>
+              <div>
+                <p className="font-medium">
+                  {t('register.errors.serverErrors.networkError')}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Affichage conditionnel du Spinner et formulaire */}
         <div className="relative">
           {/* Overlay Spinner */}
@@ -337,33 +369,34 @@ const Register = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2"
+            className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8"
             onSubmit={handleSubmit}
           >
-            <TextField
-              label={t('register.firstNameLabel')}
-              id="first_name"
-              name="first_name"
-              type="text"
-              autoComplete="given-name"
-              onChange={handleChange}
-              value={first_name}
-              error={errors.first_name}
-              required
-            />
-            <TextField
-              label={t('register.lastNameLabel')}
-              id="last_name"
-              name="last_name"
-              type="text"
-              autoComplete="family-name"
-              onChange={handleChange}
-              value={last_name}
-              error={errors.last_name}
-              required
-            />
-            <TextField
-              className="col-span-full"
+            <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+              <FormField
+                label={t('register.firstNameLabel')}
+                id="first_name"
+                name="first_name"
+                type="text"
+                autoComplete="given-name"
+                onChange={handleChange}
+                value={first_name}
+                error={errors.first_name}
+                required
+              />
+              <FormField
+                label={t('register.lastNameLabel')}
+                id="last_name"
+                name="last_name"
+                type="text"
+                autoComplete="family-name"
+                onChange={handleChange}
+                value={last_name}
+                error={errors.last_name}
+                required
+              />
+            </div>
+            <FormField
               label={t('register.emailLabel')}
               id="email"
               name="email"
@@ -371,57 +404,33 @@ const Register = () => {
               autoComplete="email"
               onChange={handleChange}
               value={email}
-              error={errors.email && !errors.email.includes(t('register.errors.serverErrors.emailExists')) ? errors.email : ''}
+              error={errors.email}
               required
             />
-            {errors.email && errors.email.includes(t('register.errors.serverErrors.emailExists')) && (
-              <motion.div 
-                className="col-span-full -mt-2 mb-1"
-                initial={{ opacity: 0, height: 0, y: -10 }}
-                animate={{ opacity: 1, height: "auto", y: 0 }}
-                transition={{ duration: 0.4, ease: "easeInOut" }}
-              >
-                <p className="text-xs font-medium text-red-600">
-                  {t('register.errors.serverErrors.emailExists')}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {t('youCan')}{' '}
-                  <Link to="/login" className="text-blue-600 hover:underline">
-                    {t('logIn')}
-                  </Link>
-                  {' '}{t('or')}{' '}
-                  <Link to="/reset-password" className="text-blue-600 hover:underline">
-                    {t('resetPassword')}
-                  </Link>
-                </p>
-              </motion.div>
-            )}
-            <TextField
-              className="col-span-full"
-              label={t('register.passwordLabel')}
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              onChange={handleChange}
-              value={password}
-              error={errors.password}
-              showPasswordToggle
-              required
-            />
-            <TextField
-              className="col-span-full"
-              label={t('register.confirmPasswordLabel')}
-              id="re_password"
-              name="re_password"
-              type="password"
-              autoComplete="new-password"
-              onChange={handleChange}
-              value={re_password}
-              error={errors.re_password}
-              showPasswordToggle
-              required
-            />
+            <div>
+              <PasswordField
+                label={t('register.passwordLabel')}
+                id="password"
+                name="password"
+                value={password}
+                onChange={handleChange}
+                error={errors.password}
+                autoComplete="new-password"
+                showStrengthMeter={true}
+              />
+            </div>
+            <div>
+              <PasswordField
+                label={t('register.confirmPasswordLabel')}
+                id="re_password"
+                name="re_password"
+                value={re_password}
+                onChange={handleChange}
+                error={errors.re_password}
+                autoComplete="new-password"
+                showStrengthMeter={false}
+              />
+            </div>
 
             <div className="col-span-full">
               <Button

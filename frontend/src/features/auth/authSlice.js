@@ -80,39 +80,66 @@ export const register = createAsyncThunk(
             // Stocker la langue dans les données de réponse
             return { ...response, language };
         } catch (error) {
-            let message = '';
+            console.log('Registration error:', error);
+            
+            // Si l'erreur est déjà un message formaté, le retourner tel quel
+            if (error.message && [
+                'EMAIL_ALREADY_EXISTS',
+                'VALIDATION_ERROR',
+                'TOO_MANY_ATTEMPTS',
+                'SERVER_ERROR',
+                'NETWORK_ERROR',
+                'UNKNOWN_ERROR'
+            ].includes(error.message)) {
+                console.log('Using formatted error message:', error.message);
+                return thunkAPI.rejectWithValue(error.message);
+            }
+
+            // Gestion des erreurs de l'API
             if (error.response) {
                 const status = error.response.status;
                 const data = error.response.data;
 
-                // Gestion des erreurs spécifiques
-                if (data.email && data.email.includes('already exists')) {
-                    message = 'email already exists';
-                } else if (status === 429) {
-                    message = 'too many attempts';
-                } else if (status === 400) {
-                    message = 'validation error';
-                } else if (status === 500) {
-                    message = 'server error';
-                } else if (data.detail && data.detail.includes('email')) {
-                    message = 'email already exists';
-                } else if (data.detail) {
-                    message = data.detail;
-                } else if (typeof data === 'string' && data.includes('email')) {
-                    message = 'email already exists';
+                // Vérifier si l'email existe déjà
+                if (data.email && Array.isArray(data.email)) {
+                    for (const msg of data.email) {
+                        if (typeof msg === 'string' && 
+                            (msg.toLowerCase().includes('existe déjà') || 
+                             msg.toLowerCase().includes('already exists'))) {
+                            return thunkAPI.rejectWithValue('EMAIL_ALREADY_EXISTS');
+                        }
+                    }
                 }
-            } else if (error.message === 'Network Error') {
-                message = 'Network Error';
-            } else if (error.message && error.message.includes('email')) {
-                message = 'email already exists';
-            } else {
-                message = 'unknown error';
+
+                // Vérifier dans detail ou autres champs génériques
+                if (data.detail && typeof data.detail === 'string') {
+                    const detail = data.detail.toLowerCase();
+                    if (detail.includes('existe déjà') || detail.includes('already exists')) {
+                        return thunkAPI.rejectWithValue('EMAIL_ALREADY_EXISTS');
+                    }
+                }
+
+                // Gestion des codes HTTP
+                switch (status) {
+                    case 400:
+                        return thunkAPI.rejectWithValue('VALIDATION_ERROR');
+                    case 429:
+                        return thunkAPI.rejectWithValue('TOO_MANY_ATTEMPTS');
+                    case 500:
+                        return thunkAPI.rejectWithValue('SERVER_ERROR');
+                    default:
+                        return thunkAPI.rejectWithValue('UNKNOWN_ERROR');
+                }
             }
 
-            console.log('Registration error:', error);
-            console.log('Error message:', message);
-            
-            return thunkAPI.rejectWithValue(message);
+            // Gestion des erreurs réseau
+            if (error.message === 'Network Error') {
+                return thunkAPI.rejectWithValue('NETWORK_ERROR');
+            }
+
+            // Erreur par défaut
+            console.log('Unknown error type:', error);
+            return thunkAPI.rejectWithValue('UNKNOWN_ERROR');
         }
     }
 );
