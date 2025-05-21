@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import useLanguage from '@/hooks/useLanguage';
 import { DEFAULT_LANGUAGE, STORAGE_KEYS } from '@/utils/config';
+import GeneralMessage from '@/components/GeneralMessage';
 
 const Login = () => {
   const { t, i18n } = useTranslation();
@@ -254,24 +255,7 @@ const Login = () => {
             </p>
           </motion.div>
           {generalError && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-8 mb-6 p-4 bg-red-600 text-white rounded-lg shadow-md relative"
-            >
-              <div className="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
-                  <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2"/>
-                  <circle cx="12" cy="16" r="1" fill="currentColor"/>
-                </svg>
-                <div>
-                  <p className="font-medium">
-                    {generalError}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
+            <GeneralMessage type="error" message={generalError} />
           )}
         </motion.div>
         <div className="relative">

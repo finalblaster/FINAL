@@ -250,7 +250,7 @@ const ResetPasswordPage = () => {
                 className="w-full"
               >
                 <span>
-                  {translations.submitButton} <span aria-hidden="true"> &rarr;</span>
+                  {translations.submitButton} <span aria-hidden="true"></span>
                 </span>
               </Button>
             </div>

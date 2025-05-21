@@ -6,6 +6,8 @@ import { toast } from 'react-toastify';
 import AuthLayout from '@/components/AuthLayout';
 import Button from '@/components/Button';
 import { TextField } from '@/components/Fields';
+import PasswordField from '@/components/PasswordField';
+import GeneralMessage from '@/components/GeneralMessage';
 import Logo from '@/components/Logo';
 import Spinner from '@/components/Spinner';
 import { resetPasswordConfirm, reset } from '@/features/auth/authSlice';
@@ -237,30 +239,31 @@ const ResetPasswordConfirmPage = () => {
             onSubmit={handleSubmit}
             className="mt-10 grid grid-cols-1 gap-y-8"
           >
-            <TextField
+            {/* Message d'erreur général en haut */}
+            {errors.general && (
+              <GeneralMessage type="error" message={errors.general} />
+            )}
+
+            <PasswordField
               label={t('resetPasswordConfirm.newPasswordLabel')}
               id="new_password"
               name="new_password"
-              type="password"
-              autoComplete="new-password"
-              onChange={handleChange}
               value={formData.new_password}
-              error={errors.new_password || errors.general}
-              showPasswordToggle
-              required
+              onChange={handleChange}
+              error={errors.new_password}
+              autoComplete="new-password"
+              showStrengthMeter={true}
             />
 
-            <TextField
+            <PasswordField
               label={t('resetPasswordConfirm.confirmPasswordLabel')}
               id="re_new_password"
               name="re_new_password"
-              type="password"
-              autoComplete="new-password"
-              onChange={handleChange}
               value={formData.re_new_password}
-              error={errors.re_new_password || errors.general}
-              showPasswordToggle
-              required
+              onChange={handleChange}
+              error={errors.re_new_password}
+              autoComplete="new-password"
+              showStrengthMeter={false}
             />
 
             <div className="col-span-full">
@@ -269,11 +272,16 @@ const ResetPasswordConfirmPage = () => {
                 variant="solid"
                 color="blue"
                 className="w-full"
-                disabled={isLoading} // Désactive le bouton si une requête est en cours
+                disabled={isLoading}
               >
                 <span>{t('resetPasswordConfirm.submitButton')}</span>
               </Button>
             </div>
+
+            {/* Message de confirmation en bas */}
+            {isSuccess && (
+              <GeneralMessage type="success" message={t('resetPasswordConfirm.successMessage')} />
+            )}
           </form>
         </div>
       </AuthLayout>
