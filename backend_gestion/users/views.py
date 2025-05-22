@@ -214,50 +214,6 @@ class CustomUserViewSet(UserViewSet):
         
         return response
 
-    @action(["get", "put"], detail=False)
-    def profile(self, request, *args, **kwargs):
-        """
-        Vue pour récupérer et mettre à jour le profil utilisateur
-        GET: Récupère les données du profil
-        PUT: Met à jour les données du profil
-        """
-        logger.debug("CustomUserViewSet.profile appelé")
-        user = request.user
-        
-        if request.method == 'GET':
-            from .serializers import UserProfileSerializer
-            serializer = UserProfileSerializer(user)
-            return Response(serializer.data)
-        
-        elif request.method == 'PUT':
-            from .serializers import UserProfileSerializer
-            
-            # Détermine et normalise la langue
-            language = None
-            if 'language' in request.data:
-                language = request.data.get('language')
-            elif 'HTTP_ACCEPT_LANGUAGE' in request.META:
-                accept_lang = request.META.get('HTTP_ACCEPT_LANGUAGE')
-                language = accept_lang.split(',')[0].split(';')[0].strip()
-            
-            # Normaliser la langue
-            if language:
-                language = language.lower()[:2]
-                supported_languages = ['fr', 'en', 'es', 'de']
-                if language not in supported_languages:
-                    language = 'fr'
-            
-            # Activer la langue pour la durée de cette requête
-            if language:
-                translation.activate(language)
-                request.LANGUAGE_CODE = language
-            
-            serializer = UserProfileSerializer(user, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     @action(["post"], detail=False)
     def set_email(self, request, *args, **kwargs):
         """
@@ -866,6 +822,8 @@ def activate_email_change(request):
                             except Exception as template_error:
                                 logger.error(f"Erreur lors du rendu du template d'avertissement: {str(template_error)}")
                                 # Fallback en cas d'erreur de template
+                                protocol = context.get('protocol', 'https')
+                                domain = context.get('domain', 'example.com')
                                 html_body = f"""
                                 <html>
                                 <body>
@@ -919,6 +877,8 @@ def activate_email_change(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
+    print('LOGIN VIEW CALLED', request.data)
+    logger.debug(f'LOGIN VIEW CALLED - data: {request.data}')
     email = request.data.get('email')
     password = request.data.get('password')
     
@@ -933,64 +893,14 @@ def login(request):
         
         # Vérifier si l'utilisateur existe mais n'est pas actif
         if not user.is_active:
-            # Générer le token d'activation avec Django
-            from django.utils.http import urlsafe_base64_encode
-            from django.utils.encoding import force_bytes
-            from django.contrib.auth.tokens import default_token_generator
-            from django.core.mail import EmailMessage
-            from django.template.loader import render_to_string
-            from bs4 import BeautifulSoup
-            
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
-            
-            # Préparation du contexte pour l'email
-            context = {
-                'user': user,
-                'domain': settings.DOMAIN,
-                'site_name': settings.SITE_NAME,
-                'protocol': 'https' if request.is_secure() else 'http',
-                'url': f'users/activation/{uid}/{token}/',
-                'current_language': getattr(request, '_user_language', 'fr')
-            }
-            
-            try:
-                # Rendre le template HTML
-                html_body = render_to_string('email/activation_email.html', context)
-                
-                # Extraire uniquement la partie HTML
-                soup = BeautifulSoup(html_body, 'html.parser')
-                html_content = str(soup.find('html'))
-                
-                # Extraire le sujet du template
-                subject = soup.title.string if soup.title else f"{settings.SITE_NAME} - {_('Confirmez votre adresse email')}"
-                
-                # Créer le message email avec uniquement le contenu HTML
-                email = EmailMessage(
-                    subject=subject,
-                    body=html_content,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[user.email]
-                )
-                email.content_subtype = "html"  # Définir le type de contenu comme HTML
-                
-                # Envoyer l'email
-                email.send()
-                logger.info(f"Email d'activation envoyé à {user.email}")
-                
-                return Response(
-                    {
-                        'detail': _('Un email d\'activation a été envoyé à votre adresse email.'),
-                        'status': 'INACTIVE_ACCOUNT'
-                    },
-                    status=status.HTTP_401_UNAUTHORIZED
-                )
-            except Exception as e:
-                logger.error(f"Erreur lors de l'envoi de l'email d'activation: {str(e)}")
-                return Response(
-                    {'detail': _('Une erreur est survenue lors de l\'envoi de l\'email d\'activation.')},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+            # NE PAS envoyer l'email d'activation automatiquement !
+            return Response(
+                {
+                    'detail': _("Votre compte n'est pas encore activé. Veuillez vérifier vos emails (y compris les spams)."),
+                    'status': 'INACTIVE_ACCOUNT'
+                },
+                status=status.HTTP_401_UNAUTHORIZED
+            )
         
         # Si l'utilisateur est actif, laisser JWT gérer l'authentification
         return Response(

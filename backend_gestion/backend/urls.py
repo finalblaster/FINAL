@@ -26,8 +26,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Utiliser nos URLs personnalisées pour l'authentification
     path('api/v1/auth/', include('users.urls')),
-    # Garder les URLs JWT standard mais pas les endpoints de base utilisateur
-    path('api/v1/auth/', include('djoser.urls.jwt')),
 ]
 
 # Ajouter les URLs pour servir les fichiers media en développement

@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { Link } from 'react-router-dom'
@@ -11,19 +11,20 @@ const classNames = (...classes) => classes.filter(Boolean).join(' ')
 const UserMenu = ({ userInfo, userNavigation }) => {
   const { isLoading } = useSelector((state) => state.auth);
   const fullName = `${userInfo?.first_name || ''} ${userInfo?.last_name || ''}`.trim();
+  const [imgError, setImgError] = useState(false);
+
+  const hasProfileImage = userInfo?.profile_image && !imgError;
 
   return (
     <Menu as="div" className="relative">
       <Menu.Button className="-m-1.5 flex items-center p-1.5 rounded-full hover:bg-gray-50 transition-colors">
         <span className="sr-only">Open user menu</span>
-        {userInfo?.profile_image ? (
+        {hasProfileImage ? (
           <img
             className="h-8 w-8 rounded-full bg-gray-50 object-cover border border-gray-100 shadow-sm"
-            src={`${API_BASE_URL}${userInfo.profile_image}`}
+            src={userInfo.profile_image.startsWith('http') ? userInfo.profile_image : `${API_BASE_URL}${userInfo.profile_image}`}
             alt={fullName}
-            onError={(e) => {
-              e.target.src = null;
-            }}
+            onError={() => setImgError(true)}
           />
         ) : (
           <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center border border-gray-100 shadow-sm">

@@ -394,145 +394,17 @@ class AuthService {
   }
 
   /**
-   * Gère les erreurs API et extrait les messages d'erreur
-   * @private
-   * @param {Error} error - Erreur Axios
-   * @returns {string} - Message d'erreur formaté
-   */
-  _handleError(error) {
-    // Afficher les détails de l'erreur pour le debugging
-    console.error("### DÉTAILS ERREUR ###");
-    console.error("Status:", error.response?.status);
-    console.error("Message d'erreur:", error.message);
-    
-    if (error.response?.data) {
-      console.error("Response body:", error.response.data);
-    }
-
-    // Si l'erreur est déjà un message d'erreur formaté, le retourner tel quel
-    if (typeof error.message === 'string' && [
-      'INVALID_CREDENTIALS',
-      'EMAIL_ALREADY_EXISTS',
-      'CURRENT_PASSWORD_INCORRECT',
-      'VALIDATION_ERROR',
-      'TOO_MANY_ATTEMPTS',
-      'SERVER_ERROR',
-      'NETWORK_ERROR',
-      'UNKNOWN_ERROR'
-    ].includes(error.message)) {
-      return error.message;
-    }
-
-    // Pas de connexion internet
-    if (!navigator.onLine || error.message === 'Network Error') {
-      return "NETWORK_ERROR";
-    }
-
-    // Gestion des erreurs HTTP
-    if (error.response) {
-      const status = error.response.status;
-      const data = error.response.data;
-
-      // Vérifier les erreurs spécifiques dans la réponse
-      if (data) {
-        // Vérifier si l'email existe déjà
-        if (data.email && Array.isArray(data.email)) {
-          for (const msg of data.email) {
-            if (typeof msg === 'string' && 
-                (msg.toLowerCase().includes('existe déjà') || 
-                 msg.toLowerCase().includes('already exists'))) {
-              return "EMAIL_ALREADY_EXISTS";
-            }
-          }
-        }
-
-        // Vérifier les erreurs de mot de passe
-        if (data.current_password && Array.isArray(data.current_password)) {
-          for (const msg of data.current_password) {
-            if (typeof msg === 'string' && 
-                (msg.toLowerCase().includes('mot de passe invalide') || 
-                 msg.toLowerCase().includes('invalid password'))) {
-              return "CURRENT_PASSWORD_INCORRECT";
-            }
-          }
-        }
-
-        // Vérifier dans detail ou autres champs génériques
-        if (data.detail && typeof data.detail === 'string') {
-          const detail = data.detail.toLowerCase();
-          if (detail.includes('existe déjà') || detail.includes('already exists')) {
-            return "EMAIL_ALREADY_EXISTS";
-          }
-          if (detail.includes('mot de passe invalide') || detail.includes('invalid password')) {
-            return "CURRENT_PASSWORD_INCORRECT";
-          }
-          if (detail.includes('incorrect') || detail.includes('invalid')) {
-            return "INVALID_CREDENTIALS";
-          }
-        }
-
-        // Vérifier les erreurs non_field_errors
-        if (data.non_field_errors && Array.isArray(data.non_field_errors)) {
-          for (const msg of data.non_field_errors) {
-            if (typeof msg === 'string') {
-              const lowerMsg = msg.toLowerCase();
-              if (lowerMsg.includes('incorrect') || 
-                  lowerMsg.includes('invalid') || 
-                  lowerMsg.includes('incorrecte') || 
-                  lowerMsg.includes('invalide')) {
-                return "INVALID_CREDENTIALS";
-              }
-            }
-          }
-        }
-      }
-
-      // Gestion des codes HTTP
-      switch (status) {
-        case 401:
-          return "INVALID_CREDENTIALS";
-        case 400:
-          // Si c'est une erreur 400 mais qu'on n'a pas trouvé de message spécifique
-          return "VALIDATION_ERROR";
-        case 429:
-          return "TOO_MANY_ATTEMPTS";
-        case 500:
-          return "SERVER_ERROR";
-        default:
-          return "UNKNOWN_ERROR";
-      }
-    }
-
-    // Si le message d'erreur contient des mots-clés spécifiques
-    if (typeof error.message === 'string') {
-      const lowerMsg = error.message.toLowerCase();
-      if (lowerMsg.includes('incorrect') || 
-          lowerMsg.includes('invalid') || 
-          lowerMsg.includes('incorrecte') || 
-          lowerMsg.includes('invalide')) {
-        return "INVALID_CREDENTIALS";
-      }
-    }
-
-    // Erreur par défaut
-    return "UNKNOWN_ERROR";
-  }
-
-  /**
-   * Obtient le profil utilisateur
+   * Obtient le profil utilisateur (Djoser standard)
    * @returns {Promise} - Réponse API avec les données de profil
    */
   async getProfile() {
     try {
-      // Déterminer la langue actuelle depuis le localStorage
       const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
-      
-      // Ajouter l'en-tête Accept-Language avec la langue actuelle
       const headers = {
         'Accept-Language': currentLanguage
       };
-      
-      const response = await secureApi.get(API_ENDPOINTS.AUTH.PROFILE, { headers });
+      // Utilise l'endpoint Djoser standard
+      const response = await secureApi.get('/api/v1/auth/users/me/', { headers });
       return response.data;
     } catch (error) {
       const message = this._handleError(error);
@@ -547,21 +419,21 @@ class AuthService {
    */
   async updateProfile(profileData) {
     try {
-      // Déterminer la langue actuelle depuis le localStorage
       const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
-      
-      // Ajouter la langue aux données
-      const requestData = {
-        ...profileData,
+      if (!profileData.first_name || !profileData.last_name) {
+        throw new Error('VALIDATION_ERROR');
+      }
+      const cleanedData = {
+        first_name: profileData.first_name.trim(),
+        last_name: profileData.last_name.trim(),
+        phone: profileData.phone ? profileData.phone.trim() : '',
         language: currentLanguage
       };
-      
-      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      console.log('[updateProfile] Payload envoyé :', cleanedData);
       const headers = {
         'Accept-Language': currentLanguage
       };
-      
-      const response = await secureApi.put(API_ENDPOINTS.AUTH.PROFILE, requestData, { headers });
+      const response = await secureApi.put('/api/v1/auth/users/me/', cleanedData, { headers });
       return response.data;
     } catch (error) {
       const message = this._handleError(error);
@@ -570,31 +442,48 @@ class AuthService {
   }
 
   /**
-   * Télécharge une image de profil
-   * @param {File} imageFile - Le fichier image à télécharger
+   * Télécharge une image de profil et met à jour les infos du profil
+   * @param {Object} data - { imageFile, first_name, last_name, phone }
    * @returns {Promise} - Réponse API avec les données de profil mises à jour
    */
-  async uploadProfileImage(imageFile) {
+  async uploadProfileImage({ imageFile, first_name, last_name, phone }) {
     try {
-      // Déterminer la langue actuelle depuis le localStorage
+      console.log('[uploadProfileImage] imageFile:', imageFile, 'type:', typeof imageFile, 'instanceof File:', imageFile instanceof File);
+      if (!imageFile || !(imageFile instanceof File)) {
+        throw new Error('INVALID_FILE');
+      }
+      if (!first_name || !last_name) {
+        throw new Error('VALIDATION_ERROR');
+      }
+      if (imageFile.size > 2 * 1024 * 1024) {
+        throw new Error('FILE_TOO_LARGE');
+      }
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (!allowedTypes.includes(imageFile.type)) {
+        throw new Error('INVALID_FILE_TYPE');
+      }
       const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
-      
-      // Créer un objet FormData pour envoyer le fichier
       const formData = new FormData();
       formData.append('profile_image', imageFile);
+      formData.append('first_name', first_name);
+      formData.append('last_name', last_name);
+      formData.append('phone', phone ?? '');
       formData.append('language', currentLanguage);
-      
-      // Ajouter l'en-tête Accept-Language avec la langue actuelle
+      console.log('[uploadProfileImage] FormData envoyé :', {
+        first_name,
+        last_name,
+        phone,
+        imageFile,
+        language: currentLanguage
+      });
       const headers = {
         'Accept-Language': currentLanguage,
         'Content-Type': 'multipart/form-data'
       };
-      
-      const response = await secureApi.put(API_ENDPOINTS.AUTH.PROFILE, formData, { 
+      const response = await secureApi.put('/api/v1/auth/users/me/', formData, {
         headers,
-        transformRequest: (data) => data  // Empêche axios de transformer le FormData
+        transformRequest: (data) => data
       });
-      
       return response.data;
     } catch (error) {
       const message = this._handleError(error);
@@ -604,27 +493,33 @@ class AuthService {
 
   /**
    * Supprime l'image de profil actuelle
+   * @param {Object} data - { first_name, last_name, phone }
    * @returns {Promise} - Réponse API avec les données de profil mises à jour
    */
-  async removeProfileImage() {
+  async removeProfileImage(data) {
     try {
-      // Déterminer la langue actuelle depuis le localStorage
       const currentLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'fr';
-      
-      // Créer l'objet de données avec null pour supprimer l'image
+      // Merge les champs du payload avec profile_image: null
       const requestData = {
+        ...data,
         profile_image: null,
         language: currentLanguage
       };
-      
-      // Ajouter l'en-tête Accept-Language avec la langue actuelle
       const headers = {
-        'Accept-Language': currentLanguage
+        'Accept-Language': currentLanguage,
+        'Content-Type': 'application/json'
       };
-      
-      const response = await secureApi.put(API_ENDPOINTS.AUTH.PROFILE, requestData, { headers });
+      const response = await secureApi.patch('/api/v1/auth/users/me/', requestData, { headers });
       return response.data;
     } catch (error) {
+      // Log détaillé de l'erreur
+      console.error('removeProfileImage - error:', error);
+      if (error && error.response) {
+        console.error('removeProfileImage - error.response:', error.response);
+        if (error.response.data) {
+          console.error('removeProfileImage - error.response.data:', error.response.data);
+        }
+      }
       const message = this._handleError(error);
       throw new Error(message);
     }
@@ -848,6 +743,131 @@ class AuthService {
       console.error("Erreur lors de la vérification des changements d'email en attente:", error);
       return { pending: false };
     }
+  }
+
+  /**
+   * Gère les erreurs API et extrait les messages d'erreur
+   * @private
+   * @param {Error} error - Erreur Axios
+   * @returns {string} - Message d'erreur formaté
+   */
+  _handleError(error) {
+    // Afficher les détails de l'erreur pour le debugging
+    console.error("### DÉTAILS ERREUR ###");
+    console.error("Status:", error.response?.status);
+    console.error("Message d'erreur:", error.message);
+    
+    if (error.response?.data) {
+      console.error("Response body:", error.response.data);
+    }
+
+    // Si l'erreur est déjà un message d'erreur formaté, le retourner tel quel
+    if (typeof error.message === 'string' && [
+      'INVALID_CREDENTIALS',
+      'EMAIL_ALREADY_EXISTS',
+      'CURRENT_PASSWORD_INCORRECT',
+      'VALIDATION_ERROR',
+      'TOO_MANY_ATTEMPTS',
+      'SERVER_ERROR',
+      'NETWORK_ERROR',
+      'UNKNOWN_ERROR'
+    ].includes(error.message)) {
+      return error.message;
+    }
+
+    // Pas de connexion internet
+    if (!navigator.onLine || error.message === 'Network Error') {
+      return "NETWORK_ERROR";
+    }
+
+    // Gestion des erreurs HTTP
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data;
+
+      // Vérifier les erreurs spécifiques dans la réponse
+      if (data) {
+        // Vérifier si l'email existe déjà
+        if (data.email && Array.isArray(data.email)) {
+          for (const msg of data.email) {
+            if (typeof msg === 'string' && 
+                (msg.toLowerCase().includes('existe déjà') || 
+                 msg.toLowerCase().includes('already exists'))) {
+              return "EMAIL_ALREADY_EXISTS";
+            }
+          }
+        }
+
+        // Vérifier les erreurs de mot de passe
+        if (data.current_password && Array.isArray(data.current_password)) {
+          for (const msg of data.current_password) {
+            if (typeof msg === 'string' && 
+                (msg.toLowerCase().includes('mot de passe invalide') || 
+                 msg.toLowerCase().includes('invalid password'))) {
+              return "CURRENT_PASSWORD_INCORRECT";
+            }
+          }
+        }
+
+        // Vérifier dans detail ou autres champs génériques
+        if (data.detail && typeof data.detail === 'string') {
+          const detail = data.detail.toLowerCase();
+          if (detail.includes('existe déjà') || detail.includes('already exists')) {
+            return "EMAIL_ALREADY_EXISTS";
+          }
+          if (detail.includes('mot de passe invalide') || detail.includes('invalid password')) {
+            return "CURRENT_PASSWORD_INCORRECT";
+          }
+          if (detail.includes('incorrect') || detail.includes('invalid')) {
+            return "INVALID_CREDENTIALS";
+          }
+        }
+
+        // Vérifier les erreurs non_field_errors
+        if (data.non_field_errors && Array.isArray(data.non_field_errors)) {
+          for (const msg of data.non_field_errors) {
+            if (typeof msg === 'string') {
+              const lowerMsg = msg.toLowerCase();
+              if (lowerMsg.includes('incorrect') || 
+                  lowerMsg.includes('invalid') || 
+                  lowerMsg.includes('incorrecte') || 
+                  lowerMsg.includes('invalide')) {
+                return "INVALID_CREDENTIALS";
+              }
+            }
+          }
+        }
+      }
+
+      // Gestion des codes HTTP
+      switch (status) {
+        case 401:
+          return "INVALID_CREDENTIALS";
+        case 400:
+          // Si c'est une erreur 400 mais qu'on n'a pas trouvé de message spécifique
+          return "VALIDATION_ERROR";
+        case 429:
+          return "TOO_MANY_ATTEMPTS";
+        case 500:
+          return "SERVER_ERROR";
+        default:
+          return "UNKNOWN_ERROR";
+      }
+    }
+
+    // Si le message d'erreur contient des mots-clés spécifiques
+    if (typeof error.message === 'string') {
+      const lowerMsg = error.message.toLowerCase();
+      if (lowerMsg.includes('incorrect') || 
+          lowerMsg.includes('invalid') || 
+          lowerMsg.includes('incorrecte') || 
+          lowerMsg.includes('invalide')) {
+        return "INVALID_CREDENTIALS";
+      }
+    }
+
+    // Erreur par défaut
+    return "UNKNOWN_ERROR";
   }
 }
 

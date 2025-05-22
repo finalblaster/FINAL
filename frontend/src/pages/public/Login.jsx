@@ -8,7 +8,7 @@ import Logo from '@/components/Logo';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '@/components/Spinner';
-import { login, reset, getProfile } from '@/features/auth/authSlice';
+import { login, reset, getProfile, resendVerification } from '@/features/auth/authSlice';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -27,12 +27,17 @@ const Login = () => {
   const [generalError, setGeneralError] = useState('');
   const location = useLocation();
   const [showVerificationAlert, setShowVerificationAlert] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
+  const [isResendingEmail, setIsResendingEmail] = useState(false);
+  const [showActivationSent, setShowActivationSent] = useState(false);
 
   const { email, password } = formData;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, isLoading, isError, isSuccess, message, userInfo } = useSelector((state) => state.auth);
   const currentLanguage = i18n.language;
+
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
   // Appliquer la langue stockée ou celle par défaut
   useEffect(() => {
@@ -49,7 +54,11 @@ const Login = () => {
 
   useEffect(() => {
     if (isError) {
-      if (message === 'INVALID_CREDENTIALS' || 
+      if (message === 'INACTIVE_ACCOUNT') {
+        // Compte inactif, montrer l'alerte de vérification
+        setShowVerificationAlert(true);
+        setVerificationEmail(email);
+      } else if (message === 'INVALID_CREDENTIALS' || 
           message.includes('401') || 
           message.includes('no refresh token available') || 
           message.includes('unauthorized') || 
@@ -156,12 +165,63 @@ const Login = () => {
         password: password.trim(),
       };
       try {
-        await dispatch(login(userData)).unwrap();
-        await dispatch(getProfile()).unwrap();
-        // NE PAS naviguer ici
+        console.log('Tentative de login, userData:', userData);
+        // 1. Vérifier l'état du compte
+        const response = await fetch(`${API_BASE}/api/v1/auth/users/login/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept-Language': currentLanguage
+          },
+          body: JSON.stringify(userData)
+        });
+        const data = await response.json();
+        console.log('Réponse /users/login/', response.status, data);
+
+        if (data.status === 'INACTIVE_ACCOUNT') {
+          setShowVerificationAlert(true);
+          setVerificationEmail(userData.email);
+          return;
+        }
+
+        // 2. Si le compte est actif, procéder à l'authentification JWT
+        if (response.ok || data.detail === "Veuillez utiliser l'endpoint JWT pour l'authentification.") {
+          const jwtResp = await dispatch(login(userData)).unwrap();
+          console.log('Réponse /jwt/create/', jwtResp);
+          await dispatch(getProfile()).unwrap();
+          setGeneralError('');
+        } else {
+          toast.error(data.detail || t('login.errors.invalidCredentials'));
+        }
       } catch (error) {
-        console.error('Login error:', error);
-        toast.error(t('login.errors.loginFailed'));
+        console.error('Erreur lors du login:', error);
+        toast.error(t('login.errors.serverError'));
+      }
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (verificationEmail && !isResendingEmail) {
+      setIsResendingEmail(true);
+      try {
+        await dispatch(resendVerification({ 
+          email: verificationEmail,
+          language: currentLanguage
+        })).unwrap();
+        toast.success(t('login.verificationEmailResent'), {
+          position: "top-center",
+          autoClose: 5000
+        });
+        setShowVerificationAlert(false);
+        setShowActivationSent(true);
+      } catch (error) {
+        toast.error(t('login.errors.resendFailed'), {
+          position: "top-center",
+          autoClose: 5000
+        });
+        console.error('Error resending verification:', error);
+      } finally {
+        setIsResendingEmail(false);
       }
     }
   };
@@ -257,6 +317,41 @@ const Login = () => {
           {generalError && (
             <GeneralMessage type="error" message={generalError} />
           )}
+          {showVerificationAlert && (
+            <div className="mt-6">
+              <GeneralMessage
+                type="info"
+                onClose={() => setShowVerificationAlert(false)}
+                message={
+                  <>
+                    {t('login.accountNotVerified')}{' '}
+                    <span
+                      onClick={!isResendingEmail ? handleResendVerification : undefined}
+                      style={{
+                        color: '#fff',
+                        textDecoration: 'underline',
+                        cursor: isResendingEmail ? 'not-allowed' : 'pointer',
+                        opacity: isResendingEmail ? 0.6 : 1,
+                        marginLeft: 4,
+                      }}
+                      tabIndex={0}
+                      role="button"
+                      aria-disabled={isResendingEmail}
+                    >
+                      {t('login.resendVerificationEmail')}
+                    </span>
+                  </>
+                }
+              />
+            </div>
+          )}
+          {showActivationSent && (
+            <GeneralMessage
+              type="success"
+              onClose={() => setShowActivationSent(false)}
+              message={t('login.activationLinkSent')}
+            />
+          )}
         </motion.div>
         <div className="relative">
           {isLoading && (
@@ -311,31 +406,6 @@ const Login = () => {
             {t('login.forgotPassword')}
           </CustomLink>
         </motion.div>
-        {showVerificationAlert && (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-6 p-4 bg-green-600 text-white rounded-lg shadow-md"
-          >
-            <div className="flex items-start">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              <div>
-                <p className="font-medium">{t('login.verificationEmailSent')}</p>
-                <button 
-                  onClick={() => setShowVerificationAlert(false)} 
-                  className="absolute top-3 right-3 text-white"
-                  aria-label="Fermer"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
       </AuthLayout>
     </>
   );

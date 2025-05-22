@@ -31,22 +31,35 @@ const COLORS = {
   info: 'bg-blue-600 text-white',
 };
 
-const GeneralMessage = ({ type = 'info', message }) => (
+const GeneralMessage = ({ type = 'info', message, onClose }) => (
   <motion.div
     initial={{ opacity: 0, y: -10 }}
     animate={{ opacity: 1, y: 0 }}
     className={`mt-8 mb-6 p-4 rounded-lg shadow-md relative flex items-start ${COLORS[type]}`}
   >
     {ICONS[type]}
-    <div>
+    <div className="flex-1">
       <p className="font-medium">{message}</p>
     </div>
+    {onClose && (
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Fermer"
+        className="absolute top-2 right-2 text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-white/70 rounded"
+      >
+        <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+        </svg>
+      </button>
+    )}
   </motion.div>
 );
 
 GeneralMessage.propTypes = {
   type: PropTypes.oneOf(['error', 'success', 'info']),
-  message: PropTypes.string.isRequired,
+  message: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  onClose: PropTypes.func,
 };
 
 export default GeneralMessage; 

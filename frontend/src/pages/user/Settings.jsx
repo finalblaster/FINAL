@@ -21,6 +21,7 @@ const Settings = () => {
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
   const [phone, setPhone] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [imgError, setImgError] = useState(false);
   
   // Define tabs at the top
   const tabs = [
@@ -1109,11 +1110,12 @@ const Settings = () => {
                     </label>
                     <div className="flex items-end space-x-4">
                       <div className="relative group">
-                        {userInfo?.profile_image ? (
+                        {userInfo?.profile_image && !imgError ? (
                           <img 
-                            src={`${API_BASE_URL}${userInfo.profile_image}`}
+                            src={userInfo.profile_image.startsWith('http') ? userInfo.profile_image : `${API_BASE_URL}${userInfo.profile_image}`}
                             alt={`${userInfo.first_name} ${userInfo.last_name}`}
                             className="h-28 w-28 rounded-full object-cover border border-gray-200 shadow-sm group-hover:opacity-90 transition-opacity"
+                            onError={() => setImgError(true)}
                           />
                         ) : (
                           <div className="h-28 w-28 rounded-full bg-blue-50 flex items-center justify-center border border-gray-200 shadow-sm">
@@ -1137,11 +1139,19 @@ const Settings = () => {
                                       toast.error(t('profile.imageSizeLimit'));
                                       return;
                                     }
-                                    
-                                    dispatch(uploadProfileImage(file))
+                                    // Log pour debug
+                                    console.log('UPLOAD IMAGE - file:', file, 'firstName:', profileData.firstName, 'lastName:', profileData.lastName, 'phone:', phone);
+                                    console.log('profile_image:', userInfo?.profile_image, 'API_BASE_URL:', API_BASE_URL);
+                                    dispatch(uploadProfileImage({
+                                      imageFile: file,
+                                      first_name: profileData.firstName,
+                                      last_name: profileData.lastName,
+                                      ...(phone && { phone })
+                                    }))
                                       .unwrap()
                                       .then(() => {
                                         toast.success(t('profile.imageUploaded'));
+                                        dispatch(getProfile());
                                       })
                                       .catch((error) => {
                                         toast.error(t('profile.imageUploadError'));
@@ -1166,12 +1176,41 @@ const Settings = () => {
                             type="button"
                             onClick={() => {
                               if (window.confirm(t('profile.removeImage') + "?")) {
-                                dispatch(removeProfileImage())
+                                // Toujours utiliser userInfo pour les champs obligatoires
+                                const first_name = userInfo?.first_name;
+                                const last_name = userInfo?.last_name;
+                                if (!first_name || !last_name) {
+                                  toast.error('Impossible de supprimer l\'image : prénom ou nom manquant.');
+                                  return;
+                                }
+                                const payload = {
+                                  first_name,
+                                  last_name,
+                                  ...(phone && { phone })
+                                };
+                                console.log('Suppression image - payload:', payload);
+                                dispatch(removeProfileImage(payload))
                                   .unwrap()
                                   .then(() => {
                                     toast.success(t('profile.imageRemoved'));
+                                    setImgError(false);
+                                    dispatch(getProfile());
                                   })
                                   .catch((error) => {
+                                    console.error('Erreur suppression image (objet complet):', error);
+                                    if (error.response && error.response.data) {
+                                      const data = error.response.data;
+                                      if (data.first_name) {
+                                        data.first_name.forEach((msg, i) => {
+                                          console.error(`Erreur backend first_name [${i}]:`, msg);
+                                        });
+                                      }
+                                      if (data.last_name) {
+                                        data.last_name.forEach((msg, i) => {
+                                          console.error(`Erreur backend last_name [${i}]:`, msg);
+                                        });
+                                      }
+                                    }
                                     toast.error(error);
                                   });
                               }

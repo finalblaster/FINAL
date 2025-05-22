@@ -36,6 +36,9 @@ export const authTranslations = Object.assign({
         networkError: 'Connection problem. Please try again later.',
         validationError: 'Please check your input and try again',
       },
+      accountNotVerified: "Your account is not yet activated, please click the link received by email, check your spam or",
+      resendVerificationEmail: "get a new link",
+      activationLinkSent: 'Activation link sent.',
     },
     resetPassword: {
       pageTitle: 'Reset Password - {{siteName}}',
@@ -198,7 +201,10 @@ export const authTranslations = Object.assign({
         allFieldsRequired: 'Tous les champs sont obligatoires',
         networkError: 'Problème de connexion. Réessayez plus tard.',
         validationError: 'Veuillez vérifier vos informations et réessayer',
-      }
+      },
+      accountNotVerified: "Votre compte n'est pas encore activé, veuillez cliquer sur le lien reçu par mail, vérifiez vos spams ou",
+      resendVerificationEmail: "recevoir un nouveau lien",
+      activationLinkSent: "Le lien d'activation a bien été envoyé.",
     },
     resetPassword: {
       pageTitle: 'Réinitialiser le mot de passe - {{siteName}}',
@@ -369,6 +375,9 @@ export const authTranslations = Object.assign({
         networkError: 'Problema de conexión. Inténtalo de nuevo más tarde.',
         validationError: 'Por favor revisa tus datos e inténtalo de nuevo',
       },
+      accountNotVerified: "Su cuenta aún no está activada, haga clic en el enlace recibido por correo, revise su spam o",
+      resendVerificationEmail: "recibir un nuevo enlace",
+      activationLinkSent: 'Enlace de activación enviado.',
     },
     accountActivation: {
       pageTitle: 'Activación de Cuenta - {{siteName}}',
@@ -387,7 +396,7 @@ export const authTranslations = Object.assign({
       }
     },
     emailActivation: {
-      pageTitle: 'Activación de Email - {{siteName}}',
+      pageTitle: 'Activación Email - {{siteName}}',
       title: 'Confirme su nuevo correo electrónico',
       subtitle: 'Haga clic en el botón a continuación para confirmar el cambio de su dirección de correo electrónico.',
       activateButton: 'Confirmar mi dirección de correo electrónico',
@@ -395,7 +404,7 @@ export const authTranslations = Object.assign({
       successMessage: 'Su nueva dirección de correo electrónico ha sido confirmada',
       errors: {
         tokenExpired: 'El enlace de confirmación ha caducado. Por favor, solicite un nuevo cambio de correo electrónico.',
-        tokenInvalid: 'El enlace de confirmación no es válido. Por favor, compruebe la URL o realice una nueva solicitud.',
+        tokenInvalid: 'El enlace de confirmación no es válido. Por favor, compruebe la URL ou realice una nueva solicitud.',
         activationFailed: 'Error en la activación. Por favor, inténtelo de nuevo o póngase en contacto con el soporte.',
         generic: 'Se ha producido un error. Por favor, inténtelo de nuevo.'
       }
@@ -457,6 +466,9 @@ export const authTranslations = Object.assign({
         networkError: 'Verbindungsproblem. Bitte versuchen Sie es später erneut.',
         validationError: 'Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut',
       },
+      accountNotVerified: "Ihr Konto ist noch nicht aktiviert, bitte klicken Sie auf den per E-Mail erhaltenen Link, prüfen Sie Ihren Spam-Ordner oder",
+      resendVerificationEmail: "neuen Link erhalten",
+      activationLinkSent: 'Aktivierungslink wurde gesendet.',
     },
     accountActivation: {
       pageTitle: 'Kontoaktivierung - {{siteName}}',

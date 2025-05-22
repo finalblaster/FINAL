@@ -152,8 +152,8 @@ export const login = createAsyncThunk(
             const response = await authService.login(userData);
             return response;
         } catch (error) {
-            // Si c'est un compte inactif, on propage l'erreur
-            if (error.message === 'INACTIVE_ACCOUNT') {
+            // Si c'est un compte inactif, on retourne l'erreur spécifique
+            if (error.response?.data?.status === 'INACTIVE_ACCOUNT') {
                 return thunkAPI.rejectWithValue('INACTIVE_ACCOUNT');
             }
             return thunkAPI.rejectWithValue(error.message);
@@ -630,6 +630,10 @@ export const updateProfile = createAsyncThunk(
         try {
             return await authService.updateProfile(profileData);
         } catch (error) {
+            // Gestion spécifique des erreurs de validation
+            if (error.message === 'VALIDATION_ERROR') {
+                return thunkAPI.rejectWithValue('VALIDATION_ERROR');
+            }
             return thunkAPI.rejectWithValue(error.message);
         }
     }
@@ -642,6 +646,16 @@ export const uploadProfileImage = createAsyncThunk(
         try {
             return await authService.uploadProfileImage(imageFile);
         } catch (error) {
+            // Gestion spécifique des erreurs de fichier
+            if (error.message === 'INVALID_FILE') {
+                return thunkAPI.rejectWithValue('INVALID_FILE');
+            }
+            if (error.message === 'FILE_TOO_LARGE') {
+                return thunkAPI.rejectWithValue('FILE_TOO_LARGE');
+            }
+            if (error.message === 'INVALID_FILE_TYPE') {
+                return thunkAPI.rejectWithValue('INVALID_FILE_TYPE');
+            }
             return thunkAPI.rejectWithValue(error.message);
         }
     }
@@ -829,21 +843,27 @@ export const authSlice = createSlice({
             // Cas pour updateProfile
             .addCase(updateProfile.pending, (state) => {
                 state.isLoading = true;
+                state.isError = false;
+                state.isSuccess = false;
+                state.message = '';
             })
             .addCase(updateProfile.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
+                state.isError = false;
                 state.userInfo = action.payload;
                 state.message = "PROFILE_UPDATED";
             })
             .addCase(updateProfile.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
+                state.isSuccess = false;
                 state.message = action.payload;
             })
             // Cas pour uploadProfileImage
             .addCase(uploadProfileImage.pending, (state) => {
                 state.isLoading = true;
+                state.isError = false;
             })
             .addCase(uploadProfileImage.fulfilled, (state, action) => {
                 state.isLoading = false;
