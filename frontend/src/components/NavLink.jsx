@@ -37,11 +37,9 @@ export function NavLink({ to, children, active = false }) {
       const targetElement = document.getElementById(targetId);
       
       if (targetElement) {
-        // Position de l'élément avec 90px supplémentaires (+20px de plus)
-        const yOffset = -80; // Décalage initial
-        const y = targetElement.getBoundingClientRect().top + window.pageYOffset + yOffset + 90;
-        
-        // Animation plus longue et plus fluide (900ms au lieu de la valeur par défaut)
+        // Position de l'élément avec un décalage plus important
+        const yOffset = 90; // Décalage souhaité
+        const y = targetElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
         smoothScrollTo(y, 900);
       }
     }

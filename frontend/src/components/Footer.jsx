@@ -41,9 +41,9 @@ const Footer = () => {
           <Logo className="mx-auto h-10 w-auto" />
           <nav className="mt-10 text-sm" aria-label="quick links">
             <div className="-my-1 flex justify-center gap-x-6">
-              <NavLink href="#features">{t('navigation.features')}</NavLink>
-              <NavLink href="#testimonials">{t('navigation.testimonials')}</NavLink>
-              <NavLink href="#pricing">{t('navigation.pricing')}</NavLink>
+              <NavLink to="#features">{t('navigation.features')}</NavLink>
+              <NavLink to="#testimonials">{t('navigation.testimonials')}</NavLink>
+              <NavLink to="#pricing">{t('navigation.pricing')}</NavLink>
             </div>
           </nav>
         </div>

@@ -12,7 +12,7 @@ html {
 #testimonials, 
 #pricing, 
 #faq {
-  scroll-margin-top: 100px;
+  scroll-margin-top: 0px;
 }
 
 /* Responsive - Décalage réduit pour mobile */
@@ -21,7 +21,7 @@ html {
   #testimonials, 
   #pricing, 
   #faq {
-    scroll-margin-top: 80px;
+    scroll-margin-top: 0px;
   }
 }
 
