@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import Logo from '@/components/Logo';
 import { Link } from 'react-router-dom';
-import React from 'react';
+import React, { useState } from 'react';
+import i18next from 'i18next';
 
 const navigation = (t) => ({
   solutions: [
@@ -162,7 +163,54 @@ const Footer = ({ className = "bg-transparent" }) => {
           </div>
         </div>
         <hr className="my-4 border-gray-200" />
-        <p className="text-xs text-gray-500 text-center">{t('footer.copyright')}</p>
+        <div className="flex items-center justify-center gap-2 text-xs text-gray-500 text-center w-full relative">
+          {/* Sélecteur de langue custom */}
+          {(() => {
+            const languages = [
+              { code: 'fr', label: 'Français' },
+              { code: 'en', label: 'English' },
+              { code: 'es', label: 'Español' },
+              { code: 'de', label: 'Deutsch' },
+            ];
+            const sortedLanguages = [...languages].sort((a, b) => a.label.localeCompare(b.label));
+            const current = sortedLanguages.find(l => l.code === i18next.language) || sortedLanguages[0];
+            const [open, setOpen] = useState(false);
+            const handleSelect = (code) => {
+              i18next.changeLanguage(code);
+              setOpen(false);
+            };
+            return (
+              <div className="relative">
+                <button
+                  className="flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  onClick={() => setOpen(o => !o)}
+                  type="button"
+                  aria-haspopup="listbox"
+                  aria-expanded={open}
+                  style={{ fontSize: 'inherit', color: 'inherit', fontWeight: 'inherit' }}
+                >
+                  {current.label}
+                  <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {open && (
+                  <ul className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 min-w-max bg-white border border-gray-200 rounded shadow z-10 px-0.5 py-1" style={{ fontSize: 'inherit', color: 'inherit', fontWeight: 'inherit' }}>
+                    {sortedLanguages.map(lang => (
+                      <li key={lang.code}>
+                        <button
+                          className={`w-full text-left px-3 py-1 hover:bg-gray-100 ${lang.code === current.code ? 'font-semibold' : ''}`}
+                          onClick={() => handleSelect(lang.code)}
+                        >
+                          {lang.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })()}
+          <span>{t('footer.copyright')}</span>
+        </div>
       </div>
     </footer>
   );
