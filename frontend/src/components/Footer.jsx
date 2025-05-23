@@ -5,8 +5,36 @@ import React from 'react';
 
 const navigation = (t) => ({
   solutions: [
-    { name: t('features.feature1', 'Our Services'), href: '/#features' },
-    { name: t('features.feature2', 'How It Works'), href: '/#features' },
+    { 
+      name: t('features.feature1', 'Our Services'), 
+      href: '/#features',
+      onClick: (e) => {
+        e.preventDefault();
+        const element = document.getElementById('features');
+        const offset = -50;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    },
+    { 
+      name: t('features.feature2', 'How It Works'), 
+      href: '/#secondary-features',
+      onClick: (e) => {
+        e.preventDefault();
+        const element = document.getElementById('secondary-features');
+        const offset = -50;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    },
   ],
   support: [
     { name: t('navigation.contact', 'Contact'), href: '/contact' },
@@ -88,7 +116,7 @@ const Footer = ({ className = "bg-transparent" }) => {
               <ul role="list" className="space-y-2">
                 {nav.solutions.map((item) => (
                   <li key={item.name}>
-                    <Link to={item.href} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                    <Link to={item.href} onClick={item.onClick} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
                       {item.name}
                     </Link>
                   </li>

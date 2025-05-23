@@ -9,6 +9,7 @@ import EmailVerificationPage from '@/pages/public/ConfirmationPage';
 import ResetPasswordConfirmPage from '@/pages/public/ResetPasswordPageConfirm';
 import ContactPage from '@/pages/public/ContactPage';
 import PrivacyPage from '@/pages/public/PrivacyPage';
+import TermsPage from '@/pages/public/TermsPage';
 
 
 export const publicRoutes = (
@@ -22,5 +23,6 @@ export const publicRoutes = (
     <Route path="/email-verification" element={<EmailVerificationPage />} />
     <Route path="/contact" element={<ContactPage />} />
     <Route path="/privacy" element={<PrivacyPage />} />
+    <Route path="/terms" element={<TermsPage />} />
   </>
 );

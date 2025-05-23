@@ -219,7 +219,11 @@ export const commonTranslations = Object.assign({
       copyright: '© 2025 {{siteName}}, Inc. All rights reserved.',
       terms: 'Terms of Service',
       privacy: 'Privacy Policy',
-      description: 'Simplifying property management through intelligent virtual assistance.'
+      description: 'Simplifying property management through intelligent virtual assistance.',
+      solutions: 'Solutions',
+      support: 'Support',
+      company: 'Company',
+      legal: 'Legal'
     },
     
     // Navigation details
@@ -292,6 +296,65 @@ export const commonTranslations = Object.assign({
       sendMessage: 'Send message',
       emailLabel: 'Email',
       phoneLabel: 'Phone number',
+    },
+    terms: {
+      title: 'Terms of Service',
+      introduction: {
+        title: 'Introduction',
+        content: 'Bienvenue sur Zoopok. Ces conditions d\'utilisation régissent votre utilisation de notre service de conciergerie numérique. En utilisant notre service, vous acceptez ces conditions.'
+      },
+      definitions: {
+        title: 'Définitions',
+        items: {
+          service: 'Service : le service de conciergerie numérique Zoopok',
+          user: 'Utilisateur : toute personne utilisant le Service',
+          content: 'Contenu : toutes les informations, données, textes, logiciels, musiques, sons, photographies, graphiques, vidéos, messages ou autres matériaux',
+          account: 'Compte : l\'espace personnel de l\'utilisateur sur le Service'
+        }
+      },
+      usage: {
+        title: 'Utilisation du Service',
+        content: 'En utilisant notre Service, vous vous engagez à :',
+        items: {
+          accurate: 'Fournir des informations exactes et complètes',
+          security: 'Maintenir la sécurité de votre compte',
+          compliance: 'Respecter toutes les lois et réglementations applicables',
+          responsible: 'Utiliser le Service de manière responsable'
+        }
+      },
+      restrictions: {
+        title: 'Restrictions',
+        content: 'Vous acceptez de ne pas :',
+        items: {
+          illegal: 'Utiliser le Service à des fins illégales',
+          harmful: 'Publier du contenu nuisible ou offensant',
+          unauthorized: 'Accéder sans autorisation à d\'autres comptes',
+          disrupt: 'Perturber le fonctionnement du Service'
+        }
+      },
+      payment: {
+        title: 'Paiements et Abonnements',
+        content: 'Les conditions de paiement incluent :',
+        items: {
+          fees: 'Les frais sont facturés à l\'avance',
+          cancellation: 'Les annulations prennent effet à la fin de la période de facturation',
+          refunds: 'Les remboursements sont soumis à notre politique de remboursement',
+          changes: 'Nous pouvons modifier nos tarifs avec un préavis de 30 jours'
+        }
+      },
+      termination: {
+        title: 'Résiliation',
+        content: 'Nous nous réservons le droit de suspendre ou de résilier votre compte en cas de violation de ces conditions. Vous pouvez résilier votre compte à tout moment en nous contactant.'
+      },
+      contact: {
+        title: 'Nous Contacter',
+        content: 'Pour toute question concernant ces conditions d\'utilisation, veuillez nous contacter à :',
+        email: 'legal@zoopok.com'
+      },
+      updates: {
+        title: 'Mises à Jour',
+        content: 'Nous nous réservons le droit de modifier ces conditions à tout moment. Les modifications prendront effet dès leur publication sur notre site. Nous vous informerons de tout changement important par email.'
+      }
     },
   },
   
@@ -504,7 +567,11 @@ export const commonTranslations = Object.assign({
       copyright: '© 2025 {{siteName}}, Inc. Tous droits réservés.',
       terms: 'Conditions d\'utilisation',
       privacy: 'Politique de confidentialité',
-      description: 'Simplifiez la gestion immobilière grâce à l\'assistance virtuelle intelligente.'
+      description: 'Simplifiez la gestion immobilière grâce à l\'assistance virtuelle intelligente.',
+      solutions: 'Solutions',
+      support: 'Support',
+      company: 'Entreprise',
+      legal: 'Mentions légales'
     },
     
     // Navigation details
@@ -585,66 +652,63 @@ export const commonTranslations = Object.assign({
       emailLabel: 'Email',
       phoneLabel: 'Téléphone',
     },
-    privacy: {
-      title: 'Politique de Confidentialité',
+    terms: {
+      title: 'Conditions d\'Utilisation',
       introduction: {
         title: 'Introduction',
-        content: 'Chez Zoopok, nous nous engageons à protéger votre vie privée et vos données personnelles. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos informations dans le cadre de notre service de conciergerie numérique.'
+        content: 'Bienvenue sur Zoopok. Ces conditions d\'utilisation régissent votre utilisation de notre service de conciergerie numérique. En utilisant notre service, vous acceptez ces conditions.'
       },
-      collection: {
-        title: 'Collecte des Informations',
-        content: 'Dans le cadre de notre service de conciergerie numérique, nous collectons les informations suivantes :',
+      definitions: {
+        title: 'Définitions',
         items: {
-          owner: 'Pour les propriétaires : nom, prénom, adresse email, numéro de téléphone, informations de paiement, détails des biens immobiliers',
-          tenant: 'Pour les locataires : nom, prénom, adresse email, numéro de téléphone, questions et demandes relatives au logement',
-          property: 'Informations sur les propriétés : adresse, équipements, règles spécifiques, documents techniques',
-          interaction: 'Historique des interactions avec notre assistant vocal 3D'
+          service: 'Service : le service de conciergerie numérique Zoopok',
+          user: 'Utilisateur : toute personne utilisant le Service',
+          content: 'Contenu : toutes les informations, données, textes, logiciels, musiques, sons, photographies, graphiques, vidéos, messages ou autres matériaux',
+          account: 'Compte : l\'espace personnel de l\'utilisateur sur le Service'
         }
       },
       usage: {
-        title: 'Utilisation des Informations',
-        content: 'Nous utilisons vos données pour :',
+        title: 'Utilisation du Service',
+        content: 'En utilisant notre Service, vous vous engagez à :',
         items: {
-          service: 'Fournir et améliorer notre service de conciergerie numérique 24/7',
-          assistant: 'Former et optimiser notre assistant vocal 3D pour répondre aux questions des locataires',
-          communication: 'Communiquer avec vous concernant votre compte et les demandes des locataires',
-          analytics: 'Analyser les tendances d\'utilisation pour améliorer nos services',
-          billing: 'Gérer la facturation et les paiements'
+          accurate: 'Fournir des informations exactes et complètes',
+          security: 'Maintenir la sécurité de votre compte',
+          compliance: 'Respecter toutes les lois et réglementations applicables',
+          responsible: 'Utiliser le Service de manière responsable'
         }
       },
-      protection: {
-        title: 'Protection des Données',
-        content: 'Nous mettons en œuvre des mesures de sécurité avancées pour protéger vos données :',
+      restrictions: {
+        title: 'Restrictions',
+        content: 'Vous acceptez de ne pas :',
         items: {
-          encryption: 'Chiffrement des données sensibles',
-          access: 'Contrôle d\'accès strict aux données',
-          audit: 'Surveillance et audit réguliers de la sécurité',
-          backup: 'Sauvegardes régulières des données'
+          illegal: 'Utiliser le Service à des fins illégales',
+          harmful: 'Publier du contenu nuisible ou offensant',
+          unauthorized: 'Accéder sans autorisation à d\'autres comptes',
+          disrupt: 'Perturber le fonctionnement du Service'
         }
       },
-      rights: {
-        title: 'Vos Droits',
-        content: 'Conformément au RGPD, vous disposez des droits suivants :',
+      payment: {
+        title: 'Paiements et Abonnements',
+        content: 'Les conditions de paiement incluent :',
         items: {
-          access: 'Droit d\'accès à vos données personnelles',
-          rectification: 'Droit de rectification des données inexactes',
-          deletion: 'Droit à l\'effacement de vos données',
-          opposition: 'Droit d\'opposition au traitement',
-          portability: 'Droit à la portabilité de vos données'
+          fees: 'Les frais sont facturés à l\'avance',
+          cancellation: 'Les annulations prennent effet à la fin de la période de facturation',
+          refunds: 'Les remboursements sont soumis à notre politique de remboursement',
+          changes: 'Nous pouvons modifier nos tarifs avec un préavis de 30 jours'
         }
       },
-      retention: {
-        title: 'Conservation des Données',
-        content: 'Nous conservons vos données aussi longtemps que nécessaire pour fournir nos services et respecter nos obligations légales. Les données sont automatiquement supprimées après une période d\'inactivité de 2 ans.'
+      termination: {
+        title: 'Résiliation',
+        content: 'Nous nous réservons le droit de suspendre ou de résilier votre compte en cas de violation de ces conditions. Vous pouvez résilier votre compte à tout moment en nous contactant.'
       },
       contact: {
         title: 'Nous Contacter',
-        content: 'Pour toute question concernant notre politique de confidentialité ou pour exercer vos droits, veuillez nous contacter à :',
-        email: 'privacy@zoopok.com'
+        content: 'Pour toute question concernant ces conditions d\'utilisation, veuillez nous contacter à :',
+        email: 'legal@zoopok.com'
       },
       updates: {
         title: 'Mises à Jour',
-        content: 'Nous nous réservons le droit de modifier cette politique de confidentialité à tout moment. Les modifications prendront effet dès leur publication sur notre site. Nous vous informerons de tout changement important par email.'
+        content: 'Nous nous réservons le droit de modifier ces conditions à tout moment. Les modifications prendront effet dès leur publication sur notre site. Nous vous informerons de tout changement important par email.'
       }
     },
   },
@@ -787,7 +851,11 @@ export const commonTranslations = Object.assign({
       copyright: '© 2025 {{siteName}}, Inc. Todos los derechos reservados.',
       terms: 'Términos de servicio',
       privacy: 'Política de privacidad',
-      description: 'Simplificando la gestión inmobiliaria a través de asistencia virtual inteligente.'
+      description: 'Simplificando la gestión inmobiliaria a través de asistencia virtual inteligente.',
+      solutions: 'Soluciones',
+      support: 'Soporte',
+      company: 'Empresa',
+      legal: 'Legal'
     },
     
     // Navigation details
@@ -997,6 +1065,65 @@ export const commonTranslations = Object.assign({
       emailLabel: 'Correo electrónico',
       phoneLabel: 'Teléfono',
     },
+    terms: {
+      title: 'Términos de Uso',
+      introduction: {
+        title: 'Introducción',
+        content: 'Bienvenido a Zoopok. Estos términos de uso rigen su uso de nuestro servicio de conserjería digital. Al utilizar nuestro servicio, acepta estos términos.'
+      },
+      definitions: {
+        title: 'Definiciones',
+        items: {
+          service: 'Servicio: el servicio de conserjería digital Zoopok',
+          user: 'Usuario: cualquier persona que utilice el Servicio',
+          content: 'Contenido: toda la información, datos, textos, software, música, sonidos, fotografías, gráficos, videos, mensajes u otros materiales',
+          account: 'Cuenta: el espacio personal del usuario en el Servicio'
+        }
+      },
+      usage: {
+        title: 'Uso del Servicio',
+        content: 'Al utilizar nuestro Servicio, se compromete a:',
+        items: {
+          accurate: 'Proporcionar información precisa y completa',
+          security: 'Mantener la seguridad de su cuenta',
+          compliance: 'Cumplir con todas las leyes y regulaciones aplicables',
+          responsible: 'Utilizar el Servicio de manera responsable'
+        }
+      },
+      restrictions: {
+        title: 'Restricciones',
+        content: 'Usted acepta no:',
+        items: {
+          illegal: 'Utilizar el Servicio para fines ilegales',
+          harmful: 'Publicar contenido dañino u ofensivo',
+          unauthorized: 'Acceder sin autorización a otras cuentas',
+          disrupt: 'Perturbar el funcionamiento del Servicio'
+        }
+      },
+      payment: {
+        title: 'Pagos y Suscripciones',
+        content: 'Las condiciones de pago incluyen:',
+        items: {
+          fees: 'Las tarifas se cobran por adelantado',
+          cancellation: 'Las cancelaciones surten efecto al final del período de facturación',
+          refunds: 'Los reembolsos están sujetos a nuestra política de reembolso',
+          changes: 'Podemos modificar nuestras tarifas con un aviso de 30 días'
+        }
+      },
+      termination: {
+        title: 'Terminación',
+        content: 'Nos reservamos el derecho de suspender o terminar su cuenta en caso de violación de estos términos. Puede cancelar su cuenta en cualquier momento contactándonos.'
+      },
+      contact: {
+        title: 'Contáctenos',
+        content: 'Para cualquier pregunta sobre estos términos de uso, contáctenos en:',
+        email: 'legal@zoopok.com'
+      },
+      updates: {
+        title: 'Actualizaciones',
+        content: 'Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación en nuestro sitio. Le notificaremos sobre cualquier cambio importante por correo electrónico.'
+      }
+    },
   },
   
   de: {
@@ -1137,7 +1264,11 @@ export const commonTranslations = Object.assign({
       copyright: '© 2025 {{siteName}}, Inc. Alle Rechte vorbehalten.',
       terms: 'Nutzungsbedingungen',
       privacy: 'Datenschutzerklärung',
-      description: 'Vereinfachen Sie die Immobilienverwaltung durch intelligente virtuelle Unterstützung.'
+      description: 'Vereinfachen Sie die Immobilienverwaltung durch intelligente virtuelle Unterstützung.',
+      solutions: 'Lösungen',
+      support: 'Support',
+      company: 'Unternehmen',
+      legal: 'Rechtliches'
     },
     
     // Navigation details
@@ -1336,8 +1467,8 @@ export const commonTranslations = Object.assign({
       }
     },
     contact: {
-      title: 'Kontaktieren Sie uns',
-      subtitle: 'Eine Frage, ein Projekt? Füllen Sie das Formular aus und wir melden uns schnellstmöglich.',
+      title: 'Kontakt',
+      subtitle: 'Bei Fragen zu diesen Nutzungsbedingungen kontaktieren Sie uns bitte unter:',
       companyLabel: 'Unternehmen',
       messageLabel: 'Nachricht',
       agreeText: 'Indem Sie dies auswählen, stimmen Sie unserer Datenschutzrichtlinie zu.',
@@ -1346,6 +1477,65 @@ export const commonTranslations = Object.assign({
       sendMessage: 'Nachricht senden',
       emailLabel: 'Email',
       phoneLabel: 'Telefonnummer',
+    },
+    terms: {
+      title: 'Nutzungsbedingungen',
+      introduction: {
+        title: 'Einführung',
+        content: 'Willkommen bei Zoopok. Diese Nutzungsbedingungen regeln Ihre Nutzung unseres digitalen Concierge-Services. Durch die Nutzung unseres Services akzeptieren Sie diese Bedingungen.'
+      },
+      definitions: {
+        title: 'Definitionen',
+        items: {
+          service: 'Service: der digitale Concierge-Service Zoopok',
+          user: 'Benutzer: jede Person, die den Service nutzt',
+          content: 'Inhalt: alle Informationen, Daten, Texte, Software, Musik, Töne, Fotografien, Grafiken, Videos, Nachrichten oder andere Materialien',
+          account: 'Konto: der persönliche Bereich des Benutzers im Service'
+        }
+      },
+      usage: {
+        title: 'Nutzung des Services',
+        content: 'Bei der Nutzung unseres Services verpflichten Sie sich:',
+        items: {
+          accurate: 'Genaue und vollständige Informationen bereitzustellen',
+          security: 'Die Sicherheit Ihres Kontos zu gewährleisten',
+          compliance: 'Alle geltenden Gesetze und Vorschriften einzuhalten',
+          responsible: 'Den Service verantwortungsvoll zu nutzen'
+        }
+      },
+      restrictions: {
+        title: 'Einschränkungen',
+        content: 'Sie stimmen zu, nicht:',
+        items: {
+          illegal: 'Den Service für illegale Zwecke zu nutzen',
+          harmful: 'Schädliche oder anstößige Inhalte zu veröffentlichen',
+          unauthorized: 'Unbefugt auf andere Konten zuzugreifen',
+          disrupt: 'Die Funktionalität des Services zu stören'
+        }
+      },
+      payment: {
+        title: 'Zahlungen und Abonnements',
+        content: 'Die Zahlungsbedingungen umfassen:',
+        items: {
+          fees: 'Gebühren werden im Voraus berechnet',
+          cancellation: 'Kündigungen werden am Ende der Abrechnungsperiode wirksam',
+          refunds: 'Rückerstattungen unterliegen unserer Rückerstattungsrichtlinie',
+          changes: 'Wir können unsere Preise mit einem Frist von 30 Tagen ändern'
+        }
+      },
+      termination: {
+        title: 'Kündigung',
+        content: 'Wir behalten uns das Recht vor, Ihr Konto bei Verstoß gegen diese Bedingungen zu sperren oder zu kündigen. Sie können Ihr Konto jederzeit durch Kontaktaufnahme mit uns kündigen.'
+      },
+      contact: {
+        title: 'Kontakt',
+        content: 'Bei Fragen zu diesen Nutzungsbedingungen kontaktieren Sie uns bitte unter:',
+        email: 'legal@zoopok.com'
+      },
+      updates: {
+        title: 'Aktualisierungen',
+        content: 'Wir behalten uns das Recht vor, diese Bedingungen jederzeit zu ändern. Änderungen werden mit ihrer Veröffentlichung auf unserer Website wirksam. Wir werden Sie über wichtige Änderungen per E-Mail informieren.'
+      }
     },
   },
 }); 
