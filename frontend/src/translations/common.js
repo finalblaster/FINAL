@@ -485,16 +485,16 @@ export const commonTranslations = Object.assign({
         answer: "Oui, nous offrons une période d'essai gratuite de 14 jours pour que vous puissiez découvrir toutes les fonctionnalités.",
       },
       faq7: {
-        question: "Wie gehen Sie mit Datenschutz um?",
-        answer: "Wir verwenden fortschrittliche Sicherheitsprotokolle, um Ihre Daten und die Ihrer Mieter zu schützen. Vertraulichkeit hat für uns höchste Priorität.",
+        question: "Comment gérez-vous la protection des données ?",
+        answer: "Nous utilisons des protocoles de sécurité avancés pour protéger vos données et celles de vos locataires. La confidentialité est notre priorité absolue.",
       },
       faq8: {
         question: "Pouvez-vous gérer plusieurs propriétés ?",
         answer: "Oui, notre service est conçu pour gérer plusieurs propriétés simultanément. Vous pouvez tout centraliser sur une seule plateforme.",
       },
       faq9: {
-        question: "What should I do if I encounter a technical problem?",
-        answer: "Unser Support-Team steht Ihnen rund um die Uhr zur Verfügung. Kontaktieren Sie uns per E-Mail oder via den in die Plattform integrierten Chat.",
+        question: "Que faire si je rencontre un problème technique ?",
+        answer: "Notre équipe de support est disponible 24h/24 et 7j/7. Contactez-nous par email ou via le chat intégré à la plateforme.",
       },
     },
     
