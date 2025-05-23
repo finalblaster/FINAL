@@ -8,6 +8,7 @@ import SecondaryFeatures from '@/components/SecondaryFeatures';
 import Faqs from '@/components/Faqs';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 
 const HomePage = () => {
   const { t } = useTranslation(); // Initialize the translation hook
@@ -15,7 +16,7 @@ const HomePage = () => {
   return (
     <>
       <Helmet>
-        <title>{t('home.pageTitle')}</title> {/* Use translation here */}
+        <title>{t('home.pageTitle')}</title>
       </Helmet>
       <Hero />
       <PrimaryFeatures />

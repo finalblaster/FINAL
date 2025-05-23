@@ -69,7 +69,7 @@ i18n
     interpolation: {
       escapeValue: false, // React gère déjà l'échappement
       defaultVariables: {
-        siteName: 'Sputnik', // Définir la variable siteName disponible pour toutes les traductions
+        siteName: 'Zoopok', // Définir la variable siteName disponible pour toutes les traductions
       },
     }
   });

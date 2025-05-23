@@ -239,14 +239,14 @@ EMAIL_PORT = 1025         # Port utilisé par MailHog pour SMTP
 EMAIL_USE_TLS = False     # Pas besoin de TLS pour MailHog
 EMAIL_HOST_USER = ''      # Laissez vide car MailHog n'utilise pas d'authentification
 EMAIL_HOST_PASSWORD = ''  # Laissez vide pour la même raison
-DEFAULT_FROM_EMAIL = 'info@sputnik.com'  # Adresse email par défaut
+DEFAULT_FROM_EMAIL = 'info@zoopok.com'  # Adresse email par défaut
 
 # Désactiver cette ligne car nous utilisons le serveur SMTP
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 DOMAIN = env("DOMAIN")
-SITE_NAME = 'Sputnik'
+SITE_NAME = 'Zoopok'
 
 # Langues supportées par l'application
 LANGUAGES = (

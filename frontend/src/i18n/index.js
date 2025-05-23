@@ -28,7 +28,7 @@ i18n
       escapeValue: true,
       // Définir des variables par défaut pour l'interpolation
       defaultVariables: {
-        siteName: 'Sputnik',
+        siteName: 'Zoopok',
       },
     },
     // Options de détection
