@@ -280,6 +280,18 @@ export const commonTranslations = Object.assign({
         validationError: 'Please verify your input and try again'
       }
     },
+    contact: {
+      title: 'Contact us',
+      subtitle: 'A question, a project? Fill out the form below and we will get back to you quickly.',
+      companyLabel: 'Company',
+      messageLabel: 'Message',
+      agreeText: 'By selecting this, you agree to our privacy policy.',
+      letsTalk: "Let's talk",
+      privacyPolicy: 'privacy policy',
+      sendMessage: 'Send message',
+      emailLabel: 'Email',
+      phoneLabel: 'Phone number',
+    },
   },
   
   fr: {
@@ -558,6 +570,18 @@ export const commonTranslations = Object.assign({
         passwordsDoNotMatch: 'Les mots de passe ne correspondent pas',
         validationError: 'Veuillez vérifier vos informations et réessayer'
       }
+    },
+    contact: {
+      title: 'Contactez-nous',
+      subtitle: 'Une question, un projet ? Remplissez le formulaire ci-dessous, nous vous répondrons rapidement.',
+      companyLabel: 'Société',
+      messageLabel: 'Message',
+      agreeText: 'En cochant cette case, vous acceptez notre politique de confidentialité.',
+      letsTalk: 'Envoyer',
+      privacyPolicy: 'politique de confidentialité',
+      sendMessage: 'Envoyer le message',
+      emailLabel: 'Email',
+      phoneLabel: 'Téléphone',
     },
   },
   
@@ -896,6 +920,18 @@ export const commonTranslations = Object.assign({
         validationError: 'Por favor, verifique su información e inténtelo de nuevo'
       }
     },
+    contact: {
+      title: 'Contáctanos',
+      subtitle: '¿Una pregunta, un proyecto? Rellena el formulario y te responderemos rápidamente.',
+      companyLabel: 'Empresa',
+      messageLabel: 'Mensaje',
+      agreeText: 'Al seleccionar esto, aceptas nuestra política de privacidad.',
+      letsTalk: 'Enviar',
+      privacyPolicy: 'política de privacidad',
+      sendMessage: 'Enviar mensaje',
+      emailLabel: 'Correo electrónico',
+      phoneLabel: 'Teléfono',
+    },
   },
   
   de: {
@@ -1232,6 +1268,18 @@ export const commonTranslations = Object.assign({
         passwordsDoNotMatch: 'Passwörter stimmen nicht überein',
         validationError: 'Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut'
       }
+    },
+    contact: {
+      title: 'Kontaktieren Sie uns',
+      subtitle: 'Eine Frage, ein Projekt? Füllen Sie das Formular aus und wir melden uns schnellstmöglich.',
+      companyLabel: 'Unternehmen',
+      messageLabel: 'Nachricht',
+      agreeText: 'Indem Sie dies auswählen, stimmen Sie unserer Datenschutzrichtlinie zu.',
+      letsTalk: 'Senden',
+      privacyPolicy: 'Datenschutzrichtlinie',
+      sendMessage: 'Nachricht senden',
+      emailLabel: 'Email',
+      phoneLabel: 'Telefonnummer',
     },
   },
 }); 

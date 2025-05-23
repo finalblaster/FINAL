@@ -7,6 +7,7 @@ import ActivatePage from '@/pages/public/ActivatePage';
 import EmailActivatePage from '@/pages/public/EmailActivatePage';
 import EmailVerificationPage from '@/pages/public/ConfirmationPage';
 import ResetPasswordConfirmPage from '@/pages/public/ResetPasswordPageConfirm';
+import ContactPage from '@/pages/public/ContactPage';
 
 
 export const publicRoutes = (
@@ -18,6 +19,6 @@ export const publicRoutes = (
     <Route path="/activate/:uid/:token" element={<ActivatePage />} />
     <Route path="/email/activate/:uid/:token/:encoded_email" element={<EmailActivatePage />} />
     <Route path="/email-verification" element={<EmailVerificationPage />} />
-    
+    <Route path="/contact" element={<ContactPage />} />
   </>
 );
