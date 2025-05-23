@@ -216,9 +216,10 @@ export const commonTranslations = Object.assign({
     
     // Footer
     footer: {
-      copyright: '© 2024 Your Company. All rights reserved.',
+      copyright: '© 2025 {{siteName}}, Inc. All rights reserved.',
       terms: 'Terms of Service',
-      privacy: 'Privacy Policy'
+      privacy: 'Privacy Policy',
+      description: 'Simplifying property management through intelligent virtual assistance.'
     },
     
     // Navigation details
@@ -500,9 +501,10 @@ export const commonTranslations = Object.assign({
     
     // Footer
     footer: {
-      copyright: '© 2024 Votre Entreprise. Tous droits réservés.',
+      copyright: '© 2025 {{siteName}}, Inc. Tous droits réservés.',
       terms: 'Conditions d\'utilisation',
-      privacy: 'Politique de confidentialité'
+      privacy: 'Politique de confidentialité',
+      description: 'Simplifiez la gestion immobilière grâce à l\'assistance virtuelle intelligente.'
     },
     
     // Navigation details
@@ -566,7 +568,7 @@ export const commonTranslations = Object.assign({
         currentPasswordIncorrect: 'Le mot de passe actuel est incorrect',
         newPasswordRequired: 'Le nouveau mot de passe est requis',
         passwordLength: 'Le mot de passe doit contenir au moins 8 caractères',
-        passwordComplexity: 'Le mot de passe doit contenir des majuscules, des minuscules, des chiffres et des caractères spéciaux',
+        passwordComplexity: 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial',
         passwordsDoNotMatch: 'Les mots de passe ne correspondent pas',
         validationError: 'Veuillez vérifier vos informations et réessayer'
       }
@@ -582,6 +584,68 @@ export const commonTranslations = Object.assign({
       sendMessage: 'Envoyer le message',
       emailLabel: 'Email',
       phoneLabel: 'Téléphone',
+    },
+    privacy: {
+      title: 'Politique de Confidentialité',
+      introduction: {
+        title: 'Introduction',
+        content: 'Chez Zoopok, nous nous engageons à protéger votre vie privée et vos données personnelles. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos informations dans le cadre de notre service de conciergerie numérique.'
+      },
+      collection: {
+        title: 'Collecte des Informations',
+        content: 'Dans le cadre de notre service de conciergerie numérique, nous collectons les informations suivantes :',
+        items: {
+          owner: 'Pour les propriétaires : nom, prénom, adresse email, numéro de téléphone, informations de paiement, détails des biens immobiliers',
+          tenant: 'Pour les locataires : nom, prénom, adresse email, numéro de téléphone, questions et demandes relatives au logement',
+          property: 'Informations sur les propriétés : adresse, équipements, règles spécifiques, documents techniques',
+          interaction: 'Historique des interactions avec notre assistant vocal 3D'
+        }
+      },
+      usage: {
+        title: 'Utilisation des Informations',
+        content: 'Nous utilisons vos données pour :',
+        items: {
+          service: 'Fournir et améliorer notre service de conciergerie numérique 24/7',
+          assistant: 'Former et optimiser notre assistant vocal 3D pour répondre aux questions des locataires',
+          communication: 'Communiquer avec vous concernant votre compte et les demandes des locataires',
+          analytics: 'Analyser les tendances d\'utilisation pour améliorer nos services',
+          billing: 'Gérer la facturation et les paiements'
+        }
+      },
+      protection: {
+        title: 'Protection des Données',
+        content: 'Nous mettons en œuvre des mesures de sécurité avancées pour protéger vos données :',
+        items: {
+          encryption: 'Chiffrement des données sensibles',
+          access: 'Contrôle d\'accès strict aux données',
+          audit: 'Surveillance et audit réguliers de la sécurité',
+          backup: 'Sauvegardes régulières des données'
+        }
+      },
+      rights: {
+        title: 'Vos Droits',
+        content: 'Conformément au RGPD, vous disposez des droits suivants :',
+        items: {
+          access: 'Droit d\'accès à vos données personnelles',
+          rectification: 'Droit de rectification des données inexactes',
+          deletion: 'Droit à l\'effacement de vos données',
+          opposition: 'Droit d\'opposition au traitement',
+          portability: 'Droit à la portabilité de vos données'
+        }
+      },
+      retention: {
+        title: 'Conservation des Données',
+        content: 'Nous conservons vos données aussi longtemps que nécessaire pour fournir nos services et respecter nos obligations légales. Les données sont automatiquement supprimées après une période d\'inactivité de 2 ans.'
+      },
+      contact: {
+        title: 'Nous Contacter',
+        content: 'Pour toute question concernant notre politique de confidentialité ou pour exercer vos droits, veuillez nous contacter à :',
+        email: 'privacy@zoopok.com'
+      },
+      updates: {
+        title: 'Mises à Jour',
+        content: 'Nous nous réservons le droit de modifier cette politique de confidentialité à tout moment. Les modifications prendront effet dès leur publication sur notre site. Nous vous informerons de tout changement important par email.'
+      }
     },
   },
   
@@ -720,9 +784,10 @@ export const commonTranslations = Object.assign({
     
     // Footer
     footer: {
-      copyright: '© 2024 Su Empresa. Todos los derechos reservados.',
+      copyright: '© 2025 {{siteName}}, Inc. Todos los derechos reservados.',
       terms: 'Términos de servicio',
-      privacy: 'Política de privacidad'
+      privacy: 'Política de privacidad',
+      description: 'Simplificando la gestión inmobiliaria a través de asistencia virtual inteligente.'
     },
     
     // Navigation details
@@ -1054,8 +1119,8 @@ export const commonTranslations = Object.assign({
         answer: 'Ja, wir bieten eine 14-tägige kostenlose Testphase an, damit Sie alle Funktionen entdecken können.',
       },
       faq7: {
-        question: 'Wie gehen Sie mit Datenschutz um?',
-        answer: 'Wir verwenden fortschrittliche Sicherheitsprotokolle, um Ihre Daten und die Ihrer Mieter zu schützen. Vertraulichkeit hat für uns höchste Priorität.',
+        question: '¿Cómo manejan la privacidad de datos?',
+        answer: 'Utilizamos protocolos de seguridad avanzados para proteger sus datos y los de sus inquilinos. La confidencialidad es nuestra prioridad.',
       },
       faq8: {
         question: "Können Sie mehrere Immobilien verwalten?",
@@ -1069,9 +1134,10 @@ export const commonTranslations = Object.assign({
     
     // Footer
     footer: {
-      copyright: '© 2024 Ihr Unternehmen. Alle Rechte vorbehalten.',
+      copyright: '© 2025 {{siteName}}, Inc. Alle Rechte vorbehalten.',
       terms: 'Nutzungsbedingungen',
-      privacy: 'Datenschutzerklärung'
+      privacy: 'Datenschutzerklärung',
+      description: 'Vereinfachen Sie die Immobilienverwaltung durch intelligente virtuelle Unterstützung.'
     },
     
     // Navigation details
@@ -1262,7 +1328,7 @@ export const commonTranslations = Object.assign({
       errors: {
         currentPasswordRequired: 'Aktuelles Passwort wird benötigt',
         currentPasswordIncorrect: 'Aktuelles Passwort ist falsch',
-        newPasswordRequired: 'Neues Passwort wird benötigt',
+        newPasswordRequired: 'Se requiere una nueva contraseña',
         passwordLength: 'Passwort muss mindestens 8 Zeichen lang sein',
         passwordComplexity: 'Passwort muss Großbuchstaben, Kleinbuchstaben, Zahlen und Sonderzeichen enthalten',
         passwordsDoNotMatch: 'Passwörter stimmen nicht überein',

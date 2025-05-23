@@ -53,7 +53,7 @@
     contact: {
       title: 'Nous Contacter',
       content: 'Pour toute question concernant notre politique de confidentialité ou pour exercer vos droits, veuillez nous contacter à :',
-      email: 'privacy@sputnik.fr'
+      email: 'privacy@zoopok.com'
     },
     updates: {
       title: 'Mises à Jour',
