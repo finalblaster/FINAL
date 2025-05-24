@@ -1146,7 +1146,7 @@ const Settings = () => {
                                       imageFile: file,
                                       first_name: profileData.firstName,
                                       last_name: profileData.lastName,
-                                      ...(phone && { phone })
+                                      phone: phone || ''
                                     }))
                                       .unwrap()
                                       .then(() => {
@@ -1186,7 +1186,7 @@ const Settings = () => {
                                 const payload = {
                                   first_name,
                                   last_name,
-                                  ...(phone && { phone })
+                                  phone: phone || ''
                                 };
                                 console.log('Suppression image - payload:', payload);
                                 dispatch(removeProfileImage(payload))

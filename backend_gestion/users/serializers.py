@@ -74,8 +74,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         
     def validate_phone(self, value):
         """Valide le format du numéro de téléphone."""
-        if value and not value.strip():
-            return None  # Autorise une valeur vide
+        if not value or not value.strip():
+            return ''  # Retourner une chaîne vide si aucune valeur n'est fournie
         
         # Enlever les espaces et caractères non numériques pour validation
         cleaned = ''.join(filter(lambda x: x.isdigit() or x in ['+', '-'], value))

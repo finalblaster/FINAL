@@ -642,9 +642,16 @@ export const updateProfile = createAsyncThunk(
 // Action pour télécharger une image de profil
 export const uploadProfileImage = createAsyncThunk(
     "auth/uploadProfileImage",
-    async (imageFile, thunkAPI) => {
+    async (imageData, thunkAPI) => {
         try {
-            return await authService.uploadProfileImage(imageFile);
+            // S'assurer que le téléphone est optionnel
+            const { imageFile, first_name, last_name, phone } = imageData;
+            return await authService.uploadProfileImage({
+                imageFile,
+                first_name,
+                last_name,
+                phone: phone || '' // Rendre le téléphone optionnel
+            });
         } catch (error) {
             // Gestion spécifique des erreurs de fichier
             if (error.message === 'INVALID_FILE') {

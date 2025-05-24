@@ -515,6 +515,52 @@ class CustomUserViewSet(UserViewSet):
             logger.error(f"Erreur lors du renvoi de l'email de confirmation: {str(e)}", exc_info=True)
             return Response({"detail": "Erreur lors du renvoi de l'email de confirmation."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(["post"], detail=False)
+    def upload_profile_image(self, request, *args, **kwargs):
+        """
+        Vue personnalisée pour l'upload d'image de profil
+        qui rend le téléphone optionnel
+        """
+        logger.debug("CustomUserViewSet.upload_profile_image appelé")
+        
+        # Vérifier l'authentification
+        if not request.user.is_authenticated:
+            logger.warning("Tentative d'upload d'image sans authentification")
+            return Response({"detail": "Vous devez être connecté pour cette action."}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Récupérer les données
+        profile_image = request.FILES.get('profile_image')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        phone = request.data.get('phone', '')  # Rendre le téléphone optionnel
+        
+        # Validation des champs obligatoires
+        if not profile_image or not first_name or not last_name:
+            logger.warning("Tentative d'upload d'image avec des données manquantes")
+            return Response({"detail": "L'image, le prénom et le nom sont obligatoires."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validation du téléphone seulement s'il est fourni et non vide
+        if phone and len(phone.replace('+', '').replace(' ', '')) < 6:
+            logger.warning("Numéro de téléphone invalide fourni")
+            return Response({"phone": ["Le numéro de téléphone doit contenir au moins 6 chiffres."]}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = request.user
+            user.first_name = first_name
+            user.last_name = last_name
+            user.phone = phone  # Le téléphone peut être vide
+            user.profile_image = profile_image
+            user.save()
+            
+            return Response({
+                "detail": "Image de profil mise à jour avec succès.",
+                "profile_image": user.profile_image.url if user.profile_image else None
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de l'upload de l'image: {str(e)}")
+            return Response({"detail": "Erreur lors de l'upload de l'image."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 # Create your views here.
 class LanguageMiddleware:
     """

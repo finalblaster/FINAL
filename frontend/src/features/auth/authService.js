@@ -467,12 +467,12 @@ class AuthService {
       formData.append('profile_image', imageFile);
       formData.append('first_name', first_name);
       formData.append('last_name', last_name);
-      formData.append('phone', phone ?? '');
+      formData.append('phone', phone || '');
       formData.append('language', currentLanguage);
       console.log('[uploadProfileImage] FormData envoyé :', {
         first_name,
         last_name,
-        phone,
+        phone: phone || '',
         imageFile,
         language: currentLanguage
       });
