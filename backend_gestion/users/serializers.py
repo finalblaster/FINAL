@@ -51,6 +51,8 @@ class CreateUserSerializer(UserCreateSerializer):
 
 # Sérialiseur pour la mise à jour du profil utilisateur
 class UserProfileSerializer(serializers.ModelSerializer):
+    phone = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'email', 'phone', 'profile_image']
@@ -74,13 +76,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
         
     def validate_phone(self, value):
         """Valide le format du numéro de téléphone."""
+        # Si aucune valeur n'est fournie ou si c'est une chaîne vide, retourner une chaîne vide
         if not value or not value.strip():
-            return ''  # Retourner une chaîne vide si aucune valeur n'est fournie
+            return ''
         
-        # Enlever les espaces et caractères non numériques pour validation
+        # Nettoyer le numéro de téléphone
         cleaned = ''.join(filter(lambda x: x.isdigit() or x in ['+', '-'], value))
         
-        # Valider la longueur minimale après nettoyage
+        # Si après nettoyage c'est vide, retourner une chaîne vide
+        if not cleaned:
+            return ''
+        
+        # Valider la longueur minimale seulement si un numéro est fourni
         if len(cleaned) < 6:
             raise serializers.ValidationError("Le numéro de téléphone doit contenir au moins 6 chiffres.")
             

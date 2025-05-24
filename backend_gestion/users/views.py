@@ -540,9 +540,14 @@ class CustomUserViewSet(UserViewSet):
             return Response({"detail": "L'image, le prénom et le nom sont obligatoires."}, status=status.HTTP_400_BAD_REQUEST)
         
         # Validation du téléphone seulement s'il est fourni et non vide
-        if phone and len(phone.replace('+', '').replace(' ', '')) < 6:
-            logger.warning("Numéro de téléphone invalide fourni")
-            return Response({"phone": ["Le numéro de téléphone doit contenir au moins 6 chiffres."]}, status=status.HTTP_400_BAD_REQUEST)
+        if phone and phone.strip():
+            cleaned_phone = ''.join(filter(lambda x: x.isdigit() or x in ['+', '-'], phone))
+            if len(cleaned_phone) < 6:
+                logger.warning("Numéro de téléphone invalide fourni")
+                return Response({"phone": ["Le numéro de téléphone doit contenir au moins 6 chiffres."]}, status=status.HTTP_400_BAD_REQUEST)
+            phone = cleaned_phone  # Utiliser le numéro nettoyé
+        else:
+            phone = ''  # S'assurer que le téléphone est vide si non fourni
         
         try:
             user = request.user

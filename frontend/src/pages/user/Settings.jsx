@@ -674,9 +674,9 @@ const Settings = () => {
       isValid = false;
     }
     
-    // Validation du téléphone
-    if (!phone || phone.trim().length < 6) {
-      errors.phone = t('profile.errors.phoneRequired');
+    // Validation du téléphone (optionnel)
+    if (phone && phone.trim() && phone.trim().length < 6) {
+      errors.phone = t('profile.errors.phoneInvalid'); // à adapter dans tes traductions
       isValid = false;
     }
     
