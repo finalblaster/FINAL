@@ -26,11 +26,41 @@ import re
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
+def extract_subject_from_html(html_content):
+    """
+    Extrait le sujet de l'email à partir du contenu HTML.
+    """
+    try:
+        # Rechercher d'abord dans la balise title
+        title_match = re.search(r'<title>(.*?)</title>', html_content, re.DOTALL)
+        if title_match:
+            subject_text = title_match.group(1).strip()
+            logger.debug(f"Sujet trouvé dans la balise title: {subject_text}")
+            return subject_text
+        
+        # Fallback: rechercher dans le bloc subject
+        subject_match = re.search(r'{%\s*block\s+subject\s*%}(.*?){%\s*endblock\s+subject\s*%}', html_content, re.DOTALL)
+        if subject_match:
+            subject_text = subject_match.group(1).strip()
+            subject_text = subject_text.replace("{{ site_name }}", settings.SITE_NAME)
+            logger.debug(f"Sujet trouvé dans le bloc subject: {subject_text}")
+            return subject_text
+        
+        logger.debug("Aucun sujet trouvé dans le template, utilisation du sujet par défaut")
+        return f"{settings.SITE_NAME} - {_('Confirmez le changement de votre adresse email')}"
+    except Exception as e:
+        logger.error(f"Erreur lors de l'extraction du sujet: {str(e)}")
+        return f"{settings.SITE_NAME} - {_('Confirmez le changement de votre adresse email')}"
+
 class CustomUserViewSet(UserViewSet):
     """
     Vue personnalisée qui étend la vue UserViewSet de Djoser
     pour inclure la gestion de la langue lors de l'enregistrement
     """
+    def __init__(self, *args, **kwargs):
+        logger.debug("=== INITIALISATION DE CustomUserViewSet ===")
+        super().__init__(*args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         logger.debug("CustomUserViewSet.create appelé")
         
@@ -220,8 +250,12 @@ class CustomUserViewSet(UserViewSet):
         Vue personnalisée pour le changement d'email (USERNAME_FIELD)
         avec gestion explicite de la langue et meilleur traitement des erreurs
         """
-        logger.debug("CustomUserViewSet.set_email appelé")
-        logger.debug(f"Données reçues: {request.data}")
+        logger.debug("=== DÉBUT DU PROCESSUS DE CHANGEMENT D'EMAIL ===")
+        logger.debug(f"CustomUserViewSet.set_email appelé avec données: {request.data}")
+        logger.debug(f"Headers: {request.headers}")
+        logger.debug(f"Method: {request.method}")
+        logger.debug(f"User: {request.user}")
+        logger.debug(f"Auth: {request.auth}")
         
         # Vérifier l'authentification
         if not request.user.is_authenticated:
@@ -232,6 +266,8 @@ class CustomUserViewSet(UserViewSet):
         new_email = request.data.get('new_email')
         re_new_email = request.data.get('re_new_email')
         current_password = request.data.get('current_password')
+        
+        logger.debug(f"Données extraites - Nouvel email: {new_email}, Confirmation: {re_new_email}")
         
         # Valider les données
         if not new_email or not re_new_email or not current_password:
@@ -244,12 +280,14 @@ class CustomUserViewSet(UserViewSet):
         
         # Vérifier le mot de passe actuel
         user = request.user
+        logger.debug(f"Vérification du mot de passe pour l'utilisateur: {user.email}")
         if not user.check_password(current_password):
             logger.warning(f"Tentative de changement d'email avec un mot de passe incorrect pour l'utilisateur {user.email}")
             return Response({"detail": "Votre mot de passe actuel est incorrect."}, status=status.HTTP_400_BAD_REQUEST)
         
         # Détermine et normalise la langue
         language = None
+        logger.debug("=== DÉTECTION DE LA LANGUE ===")
         
         # 1. Essayer de récupérer language du corps de la requête
         if 'language' in request.data:
@@ -276,33 +314,172 @@ class CustomUserViewSet(UserViewSet):
         
         # Stocker l'ancienne adresse email
         old_email = user.email
+        logger.debug(f"Ancienne adresse email: {old_email}")
         
         # Vérifier si le nouvel email est déjà utilisé
         if User.objects.filter(email=new_email).exclude(id=user.id).exists():
             logger.warning(f"Tentative de changement d'email vers une adresse déjà utilisée: {new_email}")
             return Response({"detail": "Cette adresse email est déjà utilisée par un autre compte."}, status=status.HTTP_400_BAD_REQUEST)
         
+        logger.debug("=== GÉNÉRATION DU TOKEN ===")
         # Générer un token pour la confirmation d'email
         from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
         from django.utils.encoding import force_bytes
         from django.contrib.auth.tokens import default_token_generator
         
+        try:
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            encoded_email = urlsafe_base64_encode(force_bytes(new_email))
+            
+            logger.debug(f"Token généré - UID: {uid}, Token: {token}, Encoded Email: {encoded_email}")
+            
+            # Vérifier que le token est valide immédiatement
+            if not default_token_generator.check_token(user, token):
+                logger.error("Le token généré n'est pas valide immédiatement")
+                return Response({"detail": "Erreur lors de la génération du token de confirmation."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            # Préparer l'URL de confirmation
+            confirmation_url = f"email/activate/{uid}/{token}/{encoded_email}"
+            logger.debug(f"URL de confirmation générée: {confirmation_url}")
+            
+            # Envoyer un email de vérification à la nouvelle adresse
+            try:
+                logger.debug("=== PRÉPARATION DE L'EMAIL ===")
+                from django.core.mail import EmailMessage
+                from django.template.loader import render_to_string
+                from django.utils.translation import gettext as _
+                
+                # Définir le contexte pour les templates d'email
+                context = {
+                    'user': user,
+                    'site_name': settings.SITE_NAME,
+                    'domain': settings.DOMAIN,
+                    'protocol': 'https' if request.is_secure() else 'http',
+                    'url': confirmation_url,
+                    'current_language': language,
+                    'user_language': language,
+                    'old_email': old_email,
+                    'new_email': new_email
+                }
+                
+                logger.debug(f"Contexte pour l'email: {context}")
+                
+                # Avec l'override de langue, créer et envoyer l'email de vérification
+                with translation.override(language):
+                    try:
+                        # 1. Email de confirmation à la nouvelle adresse
+                        logger.debug("Tentative de rendu du template HTML pour la nouvelle adresse")
+                        html_body = render_to_string('email/activation_changement_username.html', context)
+                        logger.debug("Template HTML rendu avec succès")
+                        
+                        subject = extract_subject_from_html(html_body)
+                        logger.debug(f"Sujet final de l'email: {subject}")
+                        
+                        from_email = settings.DEFAULT_FROM_EMAIL
+                        logger.debug(f"Email sera envoyé depuis: {from_email}")
+                        
+                        # Email de confirmation à la nouvelle adresse
+                        email = EmailMessage(
+                            subject=subject,
+                            body=html_body,
+                            from_email=from_email,
+                            to=[new_email],
+                        )
+                        email.content_subtype = "html"
+                        email.send()
+                        logger.info(f"Email de vérification pour changement d'adresse envoyé à {new_email}")
+                        
+                        # 2. Email d'alerte à l'ancienne adresse
+                        alert_context = {
+                            'user': user,
+                            'site_name': settings.SITE_NAME,
+                            'domain': settings.DOMAIN,
+                            'protocol': 'https' if request.is_secure() else 'http',
+                            'current_language': language,
+                            'user_language': language,
+                            'old_email': old_email,
+                            'new_email': new_email
+                        }
+                        
+                        alert_html = render_to_string('email/username_changed_warning.html', alert_context)
+                        alert_subject = extract_subject_from_html(alert_html)
+                        logger.debug(f"Sujet de l'alerte: {alert_subject}")
+                        
+                        alert_email = EmailMessage(
+                            subject=alert_subject,
+                            body=alert_html,
+                            from_email=from_email,
+                            to=[old_email],
+                        )
+                        alert_email.content_subtype = "html"
+                        alert_email.send()
+                        logger.info(f"Email d'alerte de sécurité envoyé à {old_email}")
+                        
+                    except Exception as template_error:
+                        logger.error(f"Erreur lors du rendu du template: {str(template_error)}", exc_info=True)
+                        return Response({"detail": "Erreur lors de la préparation des emails."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        
+            except Exception as e:
+                logger.error(f"Erreur lors de l'envoi de l'email de vérification: {str(e)}", exc_info=True)
+                return Response({"detail": "Erreur lors de l'envoi de l'email de vérification."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            logger.debug("=== FIN DU PROCESSUS DE CHANGEMENT D'EMAIL ===")
+            # Retourner une réponse indiquant que le processus de changement a été initié
+            return Response({
+                "detail": "Un email de vérification a été envoyé à votre nouvelle adresse. Veuillez cliquer sur le lien dans cet email pour confirmer le changement.",
+                "pending_email": new_email
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de la génération du token: {str(e)}", exc_info=True)
+            return Response({"detail": "Erreur lors de la génération du token de confirmation."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(["post"], detail=False)
+    def resend_email_change_confirmation(self, request, *args, **kwargs):
+        """
+        Vue pour renvoyer l'email de confirmation de changement d'email
+        """
+        logger.debug("=== DÉBUT DU RENVOI DE L'EMAIL DE CONFIRMATION ===")
+        
+        # Vérifier l'authentification
+        if not request.user.is_authenticated:
+            logger.warning("Tentative de renvoi d'email sans authentification")
+            return Response({"detail": "Vous devez être connecté pour cette action."}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        user = request.user
+        pending_email = request.data.get('pending_email')
+        
+        if not pending_email:
+            logger.warning("Tentative de renvoi d'email sans adresse email en attente")
+            return Response({"detail": "Aucune adresse email en attente de confirmation."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Détermine et normalise la langue
+        language = None
+        if 'language' in request.data:
+            language = request.data.get('language')
+        elif 'HTTP_ACCEPT_LANGUAGE' in request.META:
+            accept_lang = request.META.get('HTTP_ACCEPT_LANGUAGE')
+            language = accept_lang.split(',')[0].split(';')[0].strip()
+        
+        if language:
+            language = language.lower()[:2]
+            supported_languages = ['fr', 'en', 'es', 'de']
+            if language not in supported_languages:
+                language = 'fr'
+        else:
+            language = 'fr'
+        
+        # Générer un nouveau token
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
+        encoded_email = urlsafe_base64_encode(force_bytes(pending_email))
         
-        # Encoder également la nouvelle adresse email
-        encoded_email = urlsafe_base64_encode(force_bytes(new_email))
-        
-        # Préparer l'URL de confirmation avec l'email encodé
+        # Préparer l'URL de confirmation
         confirmation_url = f"email/activate/{uid}/{token}/{encoded_email}"
         
-        # Envoyer un email de vérification à la nouvelle adresse
+        # Envoyer l'email de confirmation
         try:
-            from django.core.mail import EmailMultiAlternatives
-            from django.template.loader import render_to_string
-            from django.utils.translation import gettext as _
-            
-            # Définir le contexte pour les templates d'email
             context = {
                 'user': user,
                 'site_name': settings.SITE_NAME,
@@ -310,78 +487,33 @@ class CustomUserViewSet(UserViewSet):
                 'protocol': 'https' if request.is_secure() else 'http',
                 'url': confirmation_url,
                 'current_language': language,
-                'user_language': language
+                'user_language': language,
+                'old_email': user.email,
+                'new_email': pending_email
             }
             
-            # Avec l'override de langue, créer et envoyer l'email de vérification
             with translation.override(language):
-                # Rendre le corps HTML en utilisant le template complet
-                context['site_name'] = settings.SITE_NAME  # S'assurer que site_name est dans le contexte
                 html_body = render_to_string('email/activation_changement_username.html', context)
-                logger.debug("Template HTML rendu avec succès")
-                
-                # Extraire le sujet du template
-                def extract_subject_from_html(html_content):
-                    try:
-                        # Rechercher d'abord dans la balise title
-                        title_match = re.search(r'<title>(.*?)</title>', html_content, re.DOTALL)
-                        if title_match:
-                            subject_text = title_match.group(1).strip()
-                            # La variable site_name est déjà intégrée dans le titre
-                            return subject_text
-                            
-                        # Fallback: rechercher dans le bloc subject (pour rétrocompatibilité)
-                        subject_match = re.search(r'{%\s*block\s+subject\s*%}(.*?){%\s*endblock\s+subject\s*%}', html_content, re.DOTALL)
-                        if subject_match:
-                            subject_text = subject_match.group(1).strip()
-                            # Remplacer directement les variables connues
-                            subject_text = subject_text.replace("{{ site_name }}", settings.SITE_NAME)
-                            return subject_text
-                            
-                        # Deuxième fallback si rien n'est trouvé
-                        return f"{settings.SITE_NAME} - {_('Notification')}"
-                    except Exception as e:
-                        logger.error(f"Erreur lors de l'extraction du sujet: {str(e)}")
-                        return f"{settings.SITE_NAME} - {_('Notification')}"
-                
-                # Extraire le sujet du template HTML
                 subject = extract_subject_from_html(html_body)
                 
-                # Si l'extraction n'a pas fonctionné, utiliser le sujet par défaut avec site_name
-                if not subject or "{{ site_name }}" in subject:
-                    subject = f"{settings.SITE_NAME} - {_('Confirmez le changement de votre adresse email')}"
-                
-                logger.debug(f"Sujet de l'email: {subject}")
-                
-                # Texte simple comme alternative
-                text_body = render_to_string('email/activation_changement_email.txt', context)
-                
-                # Créer le message email
-                from_email = settings.DEFAULT_FROM_EMAIL
-                
-                # Utiliser EmailMessage qui privilégie le contenu HTML
-                from django.core.mail import EmailMessage
                 email = EmailMessage(
                     subject=subject,
                     body=html_body,
-                    from_email=from_email,
-                    to=[new_email],
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[pending_email],
                 )
-                email.content_subtype = "html"  # Définir le type de contenu comme HTML
-                
-                # Envoyer l'email
+                email.content_subtype = "html"
                 email.send()
-                logger.info(f"Email de vérification pour changement d'adresse envoyé à {new_email}")
-                logger.info(f"URL de confirmation: {context['protocol']}://{context['domain']}/{confirmation_url}")
+                
+                logger.info(f"Email de confirmation renvoyé à {pending_email}")
+                return Response({
+                    "detail": "Un nouvel email de confirmation a été envoyé.",
+                    "pending_email": pending_email
+                }, status=status.HTTP_200_OK)
+                
         except Exception as e:
-            logger.error(f"Erreur lors de l'envoi de l'email de vérification: {str(e)}", exc_info=True)
-            return Response({"detail": "Erreur lors de l'envoi de l'email de vérification."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        # Retourner une réponse indiquant que le processus de changement a été initié
-        return Response({
-            "detail": "Un email de vérification a été envoyé à votre nouvelle adresse. Veuillez cliquer sur le lien dans cet email pour confirmer le changement.",
-            "pending_email": new_email
-        }, status=status.HTTP_200_OK)
+            logger.error(f"Erreur lors du renvoi de l'email de confirmation: {str(e)}", exc_info=True)
+            return Response({"detail": "Erreur lors du renvoi de l'email de confirmation."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Create your views here.
 class LanguageMiddleware:
@@ -565,30 +697,6 @@ def change_email(request):
                             logger.debug("Template HTML rendu avec succès")
                             
                             # Extraire le sujet du template
-                            def extract_subject_from_html(html_content):
-                                try:
-                                    # Rechercher d'abord dans la balise title
-                                    title_match = re.search(r'<title>(.*?)</title>', html_content, re.DOTALL)
-                                    if title_match:
-                                        subject_text = title_match.group(1).strip()
-                                        # La variable site_name est déjà intégrée dans le titre
-                                        return subject_text
-                                        
-                                    # Fallback: rechercher dans le bloc subject (pour rétrocompatibilité)
-                                    subject_match = re.search(r'{%\s*block\s+subject\s*%}(.*?){%\s*endblock\s+subject\s*%}', html_content, re.DOTALL)
-                                    if subject_match:
-                                        subject_text = subject_match.group(1).strip()
-                                        # Remplacer directement les variables connues
-                                        subject_text = subject_text.replace("{{ site_name }}", settings.SITE_NAME)
-                                        return subject_text
-                                        
-                                    # Deuxième fallback si rien n'est trouvé
-                                    return f"{settings.SITE_NAME} - {_('Notification')}"
-                                except Exception as e:
-                                    logger.error(f"Erreur lors de l'extraction du sujet: {str(e)}")
-                                    return f"{settings.SITE_NAME} - {_('Notification')}"
-                            
-                            # Utiliser la méthode d'extraction pour le sujet
                             subject = extract_subject_from_html(html_body)
                             
                             # Texte simple pour les clients qui ne supportent pas le HTML
@@ -658,19 +766,23 @@ def change_email(request):
 def activate_email_change(request):
     """
     Vue pour activer le changement d'adresse email après clic sur le lien de confirmation.
-    Requiert uid, token et encoded_email dans le corps de la requête ou dans les query params.
+    Accepte les paramètres en GET ou en POST.
     """
+    logger.debug("=== DÉBUT DE L'ACTIVATION DU CHANGEMENT D'EMAIL ===")
+    
     # Récupérer les paramètres en fonction de la méthode HTTP
     if request.method == 'GET':
         uid = request.query_params.get('uid')
         token = request.query_params.get('token')
         encoded_email = request.query_params.get('encoded_email')
         language = request.query_params.get('language')
+        logger.debug(f"Paramètres GET reçus - uid: {uid}, token: {token}, encoded_email: {encoded_email}, language: {language}")
     else:  # POST
         uid = request.data.get('uid')
         token = request.data.get('token')
         encoded_email = request.data.get('encoded_email')
         language = request.data.get('language')
+        logger.debug(f"Paramètres POST reçus - uid: {uid}, token: {token}, encoded_email: {encoded_email}, language: {language}")
     
     # Récupérer la langue depuis la requête si non spécifiée dans les paramètres
     if not language:
@@ -697,6 +809,7 @@ def activate_email_change(request):
     request.LANGUAGE_CODE = language
     
     if not uid or not token or not encoded_email:
+        logger.error("activate_email_change: paramètres manquants")
         return Response(
             {'error': 'UID, token et encoded_email sont requis'}, 
             status=status.HTTP_400_BAD_REQUEST
@@ -708,22 +821,39 @@ def activate_email_change(request):
         from django.contrib.auth.tokens import default_token_generator
         
         # Décoder l'UID et l'email
-        user_id = force_str(urlsafe_base64_decode(uid))
-        new_email = force_str(urlsafe_base64_decode(encoded_email))
+        try:
+            user_id = force_str(urlsafe_base64_decode(uid))
+            new_email = force_str(urlsafe_base64_decode(encoded_email))
+            logger.debug(f"Données décodées - user_id: {user_id}, new_email: {new_email}")
+        except Exception as decode_error:
+            logger.error(f"Erreur lors du décodage des données: {str(decode_error)}")
+            return Response(
+                {'error': 'Données de confirmation invalides'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
-        user = User.objects.get(pk=user_id)
+        try:
+            user = User.objects.get(pk=user_id)
+            logger.debug(f"Utilisateur trouvé: {user.email}")
+        except User.DoesNotExist:
+            logger.error(f"Utilisateur non trouvé avec l'ID: {user_id}")
+            return Response(
+                {'error': 'Utilisateur non trouvé'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
         
         # Vérifier le token
+        logger.debug(f"Vérification du token pour l'utilisateur {user.email}")
         if not default_token_generator.check_token(user, token):
-            logger.error(f"activate_email_change: token invalide pour l'utilisateur {user_id}")
+            logger.error(f"Token invalide pour l'utilisateur {user.email}")
             return Response(
                 {'error': 'Le lien de confirmation est invalide ou a expiré'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Vérifier si la nouvelle adresse email est déjà utilisée par un autre utilisateur
+        # Vérifier si la nouvelle adresse email est déjà utilisée
         if User.objects.filter(email=new_email).exclude(id=user.id).exists():
-            logger.error(f"activate_email_change: email {new_email} déjà utilisé par un autre utilisateur")
+            logger.error(f"Email {new_email} déjà utilisé par un autre utilisateur")
             return Response(
                 {'error': 'Cette adresse email est déjà utilisée par un autre compte.'}, 
                 status=status.HTTP_400_BAD_REQUEST
@@ -731,144 +861,58 @@ def activate_email_change(request):
         
         # Stocker l'ancienne adresse pour la notification
         old_email = user.email
+        logger.debug(f"Changement d'email de {old_email} à {new_email}")
         
         # Appliquer le changement d'email
         user.email = new_email
         user.save()
+        logger.info(f"Email changé avec succès pour l'utilisateur {user.id}")
         
         # Mettre à jour le USERNAME_FIELD si c'est 'email'
         if User.USERNAME_FIELD == 'email':
             setattr(user, User.USERNAME_FIELD, new_email)
             user.save(update_fields=[User.USERNAME_FIELD])
+            logger.debug(f"USERNAME_FIELD mis à jour pour l'utilisateur {user.id}")
         
-        # Envoyer un email de confirmation à l'ancienne et la nouvelle adresse
-        if getattr(settings, 'DJOSER', {}).get('USERNAME_CHANGED_EMAIL_CONFIRMATION', False):
-            try:
-                from django.core.mail import EmailMultiAlternatives
-                from django.template.loader import render_to_string
-                from django.utils.translation import gettext as _
+        # Envoyer un email de confirmation finale à la nouvelle adresse
+        try:
+            from django.core.mail import EmailMultiAlternatives
+            from django.template.loader import render_to_string
+            from django.utils.translation import gettext as _
+            
+            context = {
+                'user': user,
+                'old_email': old_email,
+                'new_email': new_email,
+                'site_name': settings.SITE_NAME,
+                'domain': settings.DOMAIN,
+                'protocol': 'https' if request.is_secure() else 'http',
+                'current_language': language,
+                'user_language': language
+            }
+            
+            with translation.override(language):
+                html_body = render_to_string('email/username_changed_confirmation_email.html', context)
+                subject = extract_subject_from_html(html_body)
+                logger.debug(f"Sujet de la confirmation finale: {subject}")
                 
-                # Définir le contexte pour les templates d'email
-                context = {
-                    'user': user,
-                    'old_email': old_email,
-                    'new_email': new_email,
-                    'site_name': settings.SITE_NAME,
-                    'domain': settings.DOMAIN,
-                    'protocol': 'https' if request.is_secure() else 'http',
-                    'current_language': language,
-                    'user_language': language
-                }
-                
-                # Avec l'override de langue, créer et envoyer l'email
-                with translation.override(language):
-                    # 1. Email de confirmation à la nouvelle adresse
-                    # Rendre le corps HTML
-                    html_body = render_to_string('email/username_changed_confirmation_email.html', context)
-                    
-                    # Extraire le sujet du template
-                    def extract_subject_from_html(html_content):
-                        try:
-                            # Rechercher d'abord dans la balise title
-                            title_match = re.search(r'<title>(.*?)</title>', html_content, re.DOTALL)
-                            if title_match:
-                                subject_text = title_match.group(1).strip()
-                                # La variable site_name est déjà intégrée dans le titre
-                                return subject_text
-                                
-                            # Fallback: rechercher dans le bloc subject (pour rétrocompatibilité)
-                            subject_match = re.search(r'{%\s*block\s+subject\s*%}(.*?){%\s*endblock\s+subject\s*%}', html_content, re.DOTALL)
-                            if subject_match:
-                                subject_text = subject_match.group(1).strip()
-                                # Remplacer directement les variables connues
-                                subject_text = subject_text.replace("{{ site_name }}", settings.SITE_NAME)
-                                return subject_text
-                                
-                            # Deuxième fallback si rien n'est trouvé
-                            return f"{settings.SITE_NAME} - {_('Notification')}"
-                        except Exception as e:
-                            logger.error(f"Erreur lors de l'extraction du sujet: {str(e)}")
-                            return f"{settings.SITE_NAME} - {_('Notification')}"
-                    
-                    # Utiliser la méthode d'extraction pour le sujet
-                    subject = extract_subject_from_html(html_body)
-                    
-                    # Texte simple pour les clients qui ne supportent pas le HTML
-                    text_body = _("Votre adresse email a été modifiée de {0} à {1}").format(old_email, new_email)
-                    
-                    # Créer le message email
-                    from_email = settings.DEFAULT_FROM_EMAIL
-                    email = EmailMultiAlternatives(subject, text_body, from_email, to=[new_email])
-                    email.attach_alternative(html_body, "text/html")
-                    
-                    # Envoyer l'email
-                    email.send()
-                    logger.info(f"Email de confirmation de changement d'adresse envoyé à {new_email}")
-                    
-                    # 2. Email d'avertissement à l'ancienne adresse
-                    if old_email != new_email:
-                        try:
-                            # Chemins des templates avec gestion de l'erreur
-                            warning_template_path = 'email/username_changed_warning.html'
-                            logger.debug(f"Tentative de rendu du template d'avertissement: {warning_template_path}")
-                            
-                            # Rendre le corps HTML d'avertissement
-                            try:
-                                html_body = render_to_string(warning_template_path, context)
-                                logger.debug("Rendu du template d'avertissement réussi")
-                                
-                                # Utiliser la même méthode d'extraction pour le sujet
-                                subject = extract_subject_from_html(html_body)
-                            except Exception as template_error:
-                                logger.error(f"Erreur lors du rendu du template d'avertissement: {str(template_error)}")
-                                # Fallback en cas d'erreur de template
-                                protocol = context.get('protocol', 'https')
-                                domain = context.get('domain', 'example.com')
-                                html_body = f"""
-                                <html>
-                                <body>
-                                    <h1>Alerte de sécurité - Changement d'adresse email</h1>
-                                    <p>Bonjour {user.first_name} {user.last_name},</p>
-                                    <p>Une demande de changement d'adresse email a été effectuée sur votre compte {settings.SITE_NAME}.</p>
-                                    <p>Votre adresse email a été modifiée de <strong>{old_email}</strong> à <strong>{new_email}</strong>.</p>
-                                    <p>Si vous n'êtes pas à l'origine de cette demande, veuillez réinitialiser votre mot de passe immédiatement 
-                                    en cliquant sur ce lien: <a href="{protocol}://{domain}/reset-password">Réinitialiser mon mot de passe</a></p>
-                                </body>
-                                </html>
-                                """
-                                # Fallback pour le sujet aussi
-                                subject = f"{settings.SITE_NAME} - {_('Alerte de changement d''adresse email')}"
-                            
-                            # Texte simple pour les clients qui ne supportent pas le HTML
-                            text_body = _("Votre adresse email sur {0} a été modifiée de {1} à {2}. Si vous n'êtes pas à l'origine de cette action, veuillez réinitialiser votre mot de passe immédiatement.").format(settings.SITE_NAME, old_email, new_email)
-                            
-                            # Créer le message email
-                            email = EmailMultiAlternatives(subject, text_body, from_email, to=[old_email])
-                            email.attach_alternative(html_body, "text/html")
-                            
-                            # Envoyer l'email
-                            email.send()
-                            logger.info(f"Email d'avertissement de changement d'adresse envoyé à l'ancienne adresse {old_email}")
-                        except Exception as warning_error:
-                            logger.error(f"Erreur lors de l'envoi de l'email d'avertissement: {str(warning_error)}", exc_info=True)
-            except Exception as e:
-                # Logger l'erreur mais ne pas bloquer le processus
-                logger.error(f"Erreur lors de l'envoi de l'email de confirmation: {str(e)}", exc_info=True)
+                email = EmailMultiAlternatives(subject, "", settings.DEFAULT_FROM_EMAIL, to=[new_email])
+                email.attach_alternative(html_body, "text/html")
+                email.send()
+                logger.info(f"Email de confirmation finale envoyé à {new_email}")
         
-        # Retourner une réponse de succès
+        except Exception as email_error:
+            logger.error(f"Erreur lors de l'envoi de l'email de confirmation finale: {str(email_error)}")
+            # Ne pas bloquer le processus si l'envoi d'email échoue
+        
+        logger.debug("=== FIN DE L'ACTIVATION DU CHANGEMENT D'EMAIL ===")
         return Response({
             'message': 'Email modifié avec succès',
             'email': new_email
         }, status=status.HTTP_200_OK)
         
-    except User.DoesNotExist:
-        logger.error(f"activate_email_change: utilisateur avec UID {uid} non trouvé")
-        return Response(
-            {'error': 'Utilisateur non trouvé'}, 
-            status=status.HTTP_404_NOT_FOUND
-        )
     except Exception as e:
-        logger.error(f"activate_email_change: erreur lors de l'activation: {str(e)}", exc_info=True)
+        logger.error(f"Erreur lors de l'activation du changement d'email: {str(e)}", exc_info=True)
         return Response(
             {'error': 'Erreur lors de l\'activation du changement d\'email'}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -909,7 +953,8 @@ def login(request):
         )
         
     except User.DoesNotExist:
+        # Message générique pour ne pas révéler si le compte existe
         return Response(
-            {'detail': _('Aucun compte n\'a été trouvé avec cet email.')},
+            {'detail': _('Adresse email ou mot de passe incorrect.')},
             status=status.HTTP_401_UNAUTHORIZED
         )

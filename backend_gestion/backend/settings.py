@@ -186,7 +186,7 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
     "USER_CREATE_PASSWORD_RETYPE": True,
     "SEND_CONFIRMATION_EMAIL": True,
-    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
+    "USERNAME_CHANGED_EMAIL_CONFIRMATION": False,
     "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
     "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
     "SET_PASSWORD_RETYPE": True,
@@ -207,7 +207,6 @@ DJOSER = {
         'confirmation': 'users.email.CustomConfirmationEmail',
         'password_reset': 'users.email.PasswordResetEmail',
         'password_changed_confirmation': 'users.email.CustomPasswordChangedConfirmationEmail',
-        'username_changed_confirmation': 'users.email.CustomUsernameChangedConfirmationEmail',
     },
     'TEMPLATES': {
         'activation_email': 'email/activation_email.html',
@@ -218,9 +217,6 @@ DJOSER = {
         'password_reset_subject': 'email/password_reset_subject.txt',
         'password_changed_confirmation_email': 'email/password_changed_confirmation_email.html',
         'password_changed_confirmation_subject': 'email/password_changed_confirmation_subject.txt',
-        'username_changed_confirmation_email': 'email/username_changed_confirmation_email.html',
-        'username_changed_confirmation_subject': 'email/username_changed_confirmation_subject.txt',
-        'username_changed_warning_email': 'email/username_changed_warning.html',
     },
     # Utiliser notre vue personnalisée pour l'enregistrement
     'USER_CREATE_CONTEXT_EXTRA_FIELDS': ['language'],

@@ -63,34 +63,37 @@ const Login = () => {
           message.includes('401') || 
           message.includes('no refresh token available') || 
           message.includes('unauthorized') || 
-          message.includes('invalid')) {
-        const errorMessage = t('login.errors.invalidCredentials');
-        toast.error(errorMessage);
+          message.includes('invalid') ||
+          message.includes('Aucun compte') ||
+          message.includes('not found')) {
         setErrors({
-          general: errorMessage,
+          email: t('login.errors.invalidCredentials'),
+          password: t('login.errors.invalidCredentials')
         });
         setGeneralError('');
       } else if (message === 'MISSING_FIELDS') {
         const errorMessage = t('login.errors.allFieldsRequired');
-        toast.error(errorMessage);
         setErrors({
-          general: errorMessage,
+          email: errorMessage,
+          password: errorMessage
         });
         setGeneralError('');
       } else if (message === 'SERVER_ERROR') {
         const errorMessage = t('login.errors.serverError');
-        toast.error(errorMessage);
         setErrors({
-          general: errorMessage,
+          email: errorMessage,
+          password: errorMessage
         });
         setGeneralError('');
       } else if (message === 'NETWORK_ERROR') {
         setGeneralError(t('login.errors.networkError'));
         setErrors({});
       } else {
-        toast.error(message);
+        // Message d'erreur générique pour tous les autres cas
+        const errorMessage = t('login.errors.invalidCredentials');
         setErrors({
-          general: message,
+          email: errorMessage,
+          password: errorMessage
         });
         setGeneralError('');
       }
@@ -188,11 +191,18 @@ const Login = () => {
           await dispatch(getProfile()).unwrap();
           setGeneralError('');
         } else {
-          toast.error(data.detail || t('login.errors.invalidCredentials'));
+          // Gérer l'erreur d'authentification
+          setErrors({
+            email: t('login.errors.invalidCredentials'),
+            password: t('login.errors.invalidCredentials')
+          });
         }
       } catch (error) {
         console.error('Erreur lors du login:', error);
-        toast.error(t('login.errors.serverError'));
+        setErrors({
+          email: t('login.errors.invalidCredentials'),
+          password: t('login.errors.invalidCredentials')
+        });
       }
     }
   };
