@@ -70,25 +70,25 @@ class CustomUserViewSet(UserViewSet):
         # 1. Vérifier dans les données POST
         if 'language' in request.data:
             language = request.data.get('language')
-            logger.debug(f"CustomUserViewSet: langue fournie dans les données: {language}")
+            logger.debug("CustomUserViewSet: langue fournie dans les données: {}".format(language))
             
         # 2. Vérifier dans l'en-tête HTTP
         elif 'HTTP_ACCEPT_LANGUAGE' in request.META:
             accept_lang = request.META.get('HTTP_ACCEPT_LANGUAGE')
             language = accept_lang.split(',')[0].split(';')[0].strip()
-            logger.debug(f"CustomUserViewSet: langue détectée dans l'en-tête HTTP: {language}")
+            logger.debug("CustomUserViewSet: langue détectée dans l'en-tête HTTP: {}".format(language))
         
         # Normaliser et valider la langue
         if language:
             language = language.lower()[:2]
             supported_languages = ['fr', 'en', 'es', 'de']
             if language not in supported_languages:
-                logger.debug(f"CustomUserViewSet: langue non supportée ({language}). Utilisation de la langue par défaut.")
+                logger.debug("CustomUserViewSet: langue non supportée ({}). Utilisation de la langue par défaut.".format(language))
                 language = 'fr'  # Langue par défaut
             
             # Stocker la langue dans la requête pour y accéder plus tard
             setattr(request, '_user_language', language)
-            logger.debug(f"CustomUserViewSet: langue {language} attachée à la requête")
+            logger.debug("CustomUserViewSet: langue {} attachée à la requête".format(language))
             
             # Activer la langue pour la durée de cette requête
             translation.activate(language)
@@ -117,25 +117,25 @@ class CustomUserViewSet(UserViewSet):
         # 1. Essayer de récupérer language du corps de la requête
         if 'language' in request.data:
             language = request.data.get('language')
-            logger.debug(f"CustomUserViewSet.reset_password: langue trouvée dans les données: {language}")
+            logger.debug("CustomUserViewSet.reset_password: langue trouvée dans les données: {}".format(language))
         
         # 2. Sinon, essayer l'en-tête HTTP Accept-Language
         elif 'HTTP_ACCEPT_LANGUAGE' in request.META:
             accept_lang = request.META.get('HTTP_ACCEPT_LANGUAGE')
             language = accept_lang.split(',')[0].split(';')[0].strip()
-            logger.debug(f"CustomUserViewSet.reset_password: langue détectée dans l'en-tête HTTP: {language}")
+            logger.debug("CustomUserViewSet.reset_password: langue détectée dans l'en-tête HTTP: {}".format(language))
         
         # Normaliser et valider la langue
         if language:
             language = language.lower()[:2]
             supported_languages = ['fr', 'en', 'es', 'de']
             if language not in supported_languages:
-                logger.debug(f"CustomUserViewSet.reset_password: langue non supportée ({language}). Utilisation de la langue par défaut.")
+                logger.debug("CustomUserViewSet.reset_password: langue non supportée ({}). Utilisation de la langue par défaut.".format(language))
                 language = 'fr'
         else:
             language = 'fr'
         
-        logger.debug(f"CustomUserViewSet.reset_password: langue finale: {language}")
+        logger.debug("CustomUserViewSet.reset_password: langue finale: {}".format(language))
         
         # Stocker la langue dans la requête
         setattr(request, '_user_language', language)
@@ -148,7 +148,7 @@ class CustomUserViewSet(UserViewSet):
         if 'email' in request.data:
             email = request.data.get('email')
             TEMP_USER_LANGUAGES[email] = language
-            logger.debug(f"CustomUserViewSet.reset_password: langue {language} stockée pour l'email {email}")
+            logger.debug("CustomUserViewSet.reset_password: langue {} stockée pour l'email {}".format(language, email))
         
         # Appeler la méthode reset_password originale
         serializer = SendEmailResetSerializer(data=request.data)
@@ -165,7 +165,7 @@ class CustomUserViewSet(UserViewSet):
             'current_language': language  # Ajouter un attribut supplémentaire
         }
         
-        logger.debug(f"CustomUserViewSet.reset_password: envoi d'email avec contexte: {context}")
+        logger.debug("CustomUserViewSet.reset_password: envoi d'email avec contexte: {}".format(context))
         
         # Créer et envoyer l'email manuellement avec translation override
         with translation.override(language):
@@ -174,7 +174,7 @@ class CustomUserViewSet(UserViewSet):
             # Si user est None, retourner un message de confirmation sans envoyer d'email
             if user is None:
                 if 'email' in request.data:
-                    logger.debug(f"CustomUserViewSet.reset_password: utilisateur non trouvé pour {request.data.get('email')}, retour d'un message de confirmation")
+                    logger.debug("CustomUserViewSet.reset_password: utilisateur non trouvé pour {}, retour d'un message de confirmation".format(request.data.get('email')))
                     return Response({
                         "detail": _("Si un compte existe avec cette adresse email, vous recevrez un lien de réinitialisation de mot de passe.")
                     }, status=200)
@@ -183,7 +183,7 @@ class CustomUserViewSet(UserViewSet):
                     return Response({"error": "Email non fourni"}, status=400)
             else:
                 email_instance.send(to=[user.email])
-                logger.debug(f"CustomUserViewSet.reset_password: email envoyé avec langue forcée à {language}")
+                logger.debug("CustomUserViewSet.reset_password: email envoyé avec langue forcée à {}".format(language))
                 return Response({
                     "detail": _("Si un compte existe avec cette adresse email, vous recevrez un lien de réinitialisation de mot de passe.")
                 }, status=200)
@@ -202,25 +202,25 @@ class CustomUserViewSet(UserViewSet):
         # 1. Essayer de récupérer language du corps de la requête
         if 'language' in request.data:
             language = request.data.get('language')
-            logger.debug(f"CustomUserViewSet.set_password: langue trouvée dans les données: {language}")
+            logger.debug("CustomUserViewSet.set_password: langue trouvée dans les données: {}".format(language))
         
         # 2. Sinon, essayer l'en-tête HTTP Accept-Language
         elif 'HTTP_ACCEPT_LANGUAGE' in request.META:
             accept_lang = request.META.get('HTTP_ACCEPT_LANGUAGE')
             language = accept_lang.split(',')[0].split(';')[0].strip()
-            logger.debug(f"CustomUserViewSet.set_password: langue détectée dans l'en-tête HTTP: {language}")
+            logger.debug("CustomUserViewSet.set_password: langue détectée dans l'en-tête HTTP: {}".format(language))
         
         # Normaliser et valider la langue
         if language:
             language = language.lower()[:2]
             supported_languages = ['fr', 'en', 'es', 'de']
             if language not in supported_languages:
-                logger.debug(f"CustomUserViewSet.set_password: langue non supportée ({language}). Utilisation de la langue par défaut.")
+                logger.debug("CustomUserViewSet.set_password: langue non supportée ({}). Utilisation de la langue par défaut.".format(language))
                 language = 'fr'
         else:
             language = 'fr'
         
-        logger.debug(f"CustomUserViewSet.set_password: langue finale: {language}")
+        logger.debug("CustomUserViewSet.set_password: langue finale: {}".format(language))
         
         # Stocker la langue dans la requête
         setattr(request, '_user_language', language)
@@ -232,7 +232,7 @@ class CustomUserViewSet(UserViewSet):
         # Stocker la langue pour l'utilisateur authentifié si disponible
         if request.user and request.user.is_authenticated and hasattr(request.user, 'email'):
             TEMP_USER_LANGUAGES[request.user.email] = language
-            logger.debug(f"CustomUserViewSet.set_password: langue {language} stockée pour l'email {request.user.email}")
+            logger.debug("CustomUserViewSet.set_password: langue {} stockée pour l'email {}".format(language, request.user.email))
         
         # Appeler la méthode set_password originale pour changer le mot de passe
         # L'email sera envoyé par la méthode parente grâce au paramètre PASSWORD_CHANGED_EMAIL_CONFIRMATION

@@ -356,6 +356,19 @@ export const commonTranslations = Object.assign({
         content: 'Nous nous réservons le droit de modifier ces conditions à tout moment. Les modifications prendront effet dès leur publication sur notre site. Nous vous informerons de tout changement important par email.'
       }
     },
+    resetPassword: {
+      pageTitle: 'Reset Password - {{siteName}}',
+      title: 'Reset your password',
+      subtitle: 'Enter the email address associated with your account. We will send you a link to reset your password.',
+      emailLabel: 'Email address',
+      submitButton: 'Send reset link',
+      successMessage: 'A password reset email has been sent.',
+      errors: {
+        emailRequired: 'Email address is required',
+        emailInvalid: 'Email address is invalid',
+        genericError: 'An error occurred while sending the reset email. Please try again.'
+      }
+    },
   },
   
   fr: {
@@ -711,6 +724,19 @@ export const commonTranslations = Object.assign({
         content: 'Nous nous réservons le droit de modifier ces conditions à tout moment. Les modifications prendront effet dès leur publication sur notre site. Nous vous informerons de tout changement important par email.'
       }
     },
+    resetPassword: {
+      pageTitle: 'Réinitialiser le mot de passe - {{siteName}}',
+      title: 'Réinitialiser votre mot de passe',
+      subtitle: 'Entrez l\'adresse email associée à votre compte. Nous vous enverrons un lien pour réinitialiser votre mot de passe.',
+      emailLabel: 'Adresse email',
+      submitButton: 'Envoyer le lien de réinitialisation',
+      successMessage: 'Un e-mail de réinitialisation de mot de passe a été envoyé.',
+      errors: {
+        emailRequired: 'L\'adresse email est requise',
+        emailInvalid: 'L\'adresse email n\'est pas valide',
+        genericError: 'Une erreur est survenue lors de l\'envoi de l\'email de réinitialisation. Veuillez réessayer.'
+      }
+    },
   },
   
   es: {
@@ -924,7 +950,8 @@ export const commonTranslations = Object.assign({
       errors: {
         emailRequired: 'Se requiere dirección de correo electrónico',
         emailInvalid: 'La dirección de correo electrónico no es válida',
-      },
+        genericError: 'Se produjo un error al enviar el correo de restablecimiento. Por favor, inténtelo de nuevo.'
+      }
     },
     
     // Register Page
@@ -1337,7 +1364,8 @@ export const commonTranslations = Object.assign({
       errors: {
         emailRequired: 'E-Mail-Adresse ist erforderlich',
         emailInvalid: 'E-Mail-Adresse ist ungültig',
-      },
+        genericError: 'Beim Senden der E-Mail zum Zurücksetzen des Passworts ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.'
+      }
     },
     
     // Register Page

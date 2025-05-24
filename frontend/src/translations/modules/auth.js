@@ -51,7 +51,8 @@ export const authTranslations = Object.assign({
       errors: {
         emailRequired: 'Email address is required',
         emailInvalid: 'Email address is invalid',
-      },
+        genericError: 'An error occurred while sending the reset email. Please try again.'
+      }
     },
     register: {
       pageTitle: 'Sign Up - {{siteName}}',
@@ -211,19 +212,14 @@ export const authTranslations = Object.assign({
     resetPassword: {
       pageTitle: 'Réinitialiser le mot de passe - {{siteName}}',
       title: 'Réinitialiser votre mot de passe',
-      subtitle: 'Entrez votre adresse email pour recevoir un lien de réinitialisation',
+      subtitle: 'Entrez l\'adresse email associée à votre compte. Nous vous enverrons un lien pour réinitialiser votre mot de passe.',
       emailLabel: 'Adresse email',
-      emailPlaceholder: 'Entrez votre adresse email',
-      submitButton: 'Envoyer le lien',
-      loginLink: 'Retour à la connexion',
-      successMessage: 'Si cette adresse email existe dans notre base de données, vous recevrez un lien de réinitialisation',
+      submitButton: 'Envoyer le lien de réinitialisation',
+      successMessage: 'Un e-mail de réinitialisation de mot de passe a été envoyé.',
       errors: {
-        emailRequired: 'Veuillez entrer votre adresse email',
-        emailInvalid: 'Veuillez entrer une adresse email valide',
-        accountNotFound: 'Aucun compte trouvé avec cette adresse email',
-        tooManyRequests: 'Trop de tentatives. Veuillez réessayer plus tard',
-        serverError: 'Une erreur s\'est produite. Veuillez réessayer plus tard',
-        networkError: 'Problème de connexion. Réessayez plus tard.',
+        emailRequired: 'L\'adresse email est requise',
+        emailInvalid: 'L\'adresse email n\'est pas valide',
+        genericError: 'Une erreur est survenue lors de l\'envoi de l\'email de réinitialisation. Veuillez réessayer.'
       }
     },
     register: {
@@ -415,7 +411,19 @@ export const authTranslations = Object.assign({
     youCan: 'Puede',
     logIn: 'iniciar sesión',
     or: 'o',
-    resetPassword: 'restablecer su contraseña',
+    resetPassword: {
+      pageTitle: 'Restablecer Contraseña - {{siteName}}',
+      title: 'Restablecer su contraseña',
+      subtitle: 'Ingrese la dirección de correo electrónico asociada con su cuenta. Le enviaremos un enlace para restablecer su contraseña.',
+      emailLabel: 'Dirección de correo electrónico',
+      submitButton: 'Enviar enlace de restablecimiento',
+      successMessage: 'Se ha enviado un correo electrónico para restablecer la contraseña.',
+      errors: {
+        emailRequired: 'Se requiere dirección de correo electrónico',
+        emailInvalid: 'La dirección de correo electrónico no es válida',
+        genericError: 'Se produjo un error al enviar el correo de restablecimiento. Por favor, inténtelo de nuevo.'
+      }
+    },
     resetPasswordConfirm: {
       pageTitle: 'Restablecer Contraseña - {{siteName}}',
       title: 'Restablecer su contraseña',
@@ -507,7 +515,19 @@ export const authTranslations = Object.assign({
     youCan: 'Sie können',
     logIn: 'sich anmelden',
     or: 'oder',
-    resetPassword: 'Ihr Passwort zurücksetzen',
+    resetPassword: {
+      pageTitle: 'Passwort zurücksetzen - {{siteName}}',
+      title: 'Setzen Sie Ihr Passwort zurück',
+      subtitle: 'Geben Sie die mit Ihrem Konto verknüpfte E-Mail-Adresse ein. Wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts.',
+      emailLabel: 'E-Mail-Adresse',
+      submitButton: 'Link zum Zurücksetzen senden',
+      successMessage: 'Eine E-Mail zum Zurücksetzen des Passworts wurde gesendet.',
+      errors: {
+        emailRequired: 'E-Mail-Adresse ist erforderlich',
+        emailInvalid: 'E-Mail-Adresse ist ungültig',
+        genericError: 'Beim Senden der E-Mail zum Zurücksetzen des Passworts ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.'
+      }
+    },
     resetPasswordConfirm: {
       pageTitle: 'Passwort zurücksetzen - {{siteName}}',
       title: 'Setzen Sie Ihr Passwort zurück',

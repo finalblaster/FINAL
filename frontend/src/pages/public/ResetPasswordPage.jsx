@@ -9,12 +9,11 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '@/components/Spinner';
 import { resetPassword, reset } from '@/features/auth/authSlice';
-import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { commonTranslations } from '@/translations/common';
 import useLanguage from '@/hooks/useLanguage';
 import { DEFAULT_LANGUAGE, STORAGE_KEYS } from '@/utils/config';
 import { motion } from 'framer-motion';
+import GeneralMessage from '@/components/GeneralMessage';
 
 // Nom de la page dans différentes langues
 const pageNames = {
@@ -81,79 +80,43 @@ const deTranslations = {
 };
 
 const ResetPasswordPage = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { changeLanguage } = useLanguage();
   const [email, setEmail] = useState('');
-  const [translations, setTranslations] = useState(frTranslations);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [error, setError] = useState('');
+
+  // Obtenir les traductions en fonction de la langue actuelle
+  const getTranslations = () => {
+    const currentLang = i18n.language || DEFAULT_LANGUAGE;
+    switch (currentLang) {
+      case 'es':
+        return esTranslations;
+      case 'fr':
+        return frTranslations;
+      case 'de':
+        return deTranslations;
+      default:
+        return enTranslations;
+    }
+  };
+
+  const translations = getTranslations();
 
   // Appliquer la langue stockée ou celle par défaut au chargement de la page
   useEffect(() => {
-    // Récupérer la langue stockée dans localStorage
     const savedLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE);
     
-    // Si une langue est déjà enregistrée, l'utiliser
     if (savedLanguage) {
       console.log('Restauration de la langue sauvegardée:', savedLanguage);
       changeLanguage(savedLanguage);
-      
-      // Sélectionner les traductions en fonction de la langue
-      switch(savedLanguage) {
-        case 'es':
-          setTranslations(esTranslations);
-          break;
-        case 'en':
-          setTranslations(enTranslations);
-          break;
-        case 'de':
-          setTranslations(deTranslations);
-          break;
-        default:
-          setTranslations(frTranslations);
-      }
-    } 
-    // Sinon, utiliser la langue par défaut
-    else {
+    } else {
       console.log('Aucune langue sauvegardée, utilisation de la langue par défaut:', DEFAULT_LANGUAGE);
       changeLanguage(DEFAULT_LANGUAGE);
-      
-      // Définir les traductions par défaut
-      switch(DEFAULT_LANGUAGE) {
-        case 'es':
-          setTranslations(esTranslations);
-          break;
-        case 'en':
-          setTranslations(enTranslations);
-          break;
-        case 'de':
-          setTranslations(deTranslations);
-          break;
-        default:
-          setTranslations(frTranslations);
-      }
     }
   }, [changeLanguage]);
-  
-  // Mettre à jour les traductions quand la langue change
-  useEffect(() => {
-    const currentLang = i18n.language || DEFAULT_LANGUAGE;
-    switch(currentLang) {
-      case 'es':
-        setTranslations(esTranslations);
-        break;
-      case 'en':
-        setTranslations(enTranslations);
-        break;
-      case 'de':
-        setTranslations(deTranslations);
-        break;
-      default:
-        setTranslations(frTranslations);
-    }
-  }, [i18n.language]);
 
   const handleChange = (e) => {
-    // Supprime tous les espaces pour l'email immédiatement
     const valueWithoutSpaces = e.target.value.replace(/\s/g, '');
     setEmail(valueWithoutSpaces);
   };
@@ -165,42 +128,38 @@ const ResetPasswordPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');
     
     const cleanEmail = email.replace(/\s/g, '');
     if (cleanEmail === "") {
-      toast.error(translations.errors.emailRequired);
+      setError(translations.errors.emailRequired);
       return;
     }
 
-    // Récupérer la langue actuelle
     const currentLanguage = i18n.language || localStorage.getItem(STORAGE_KEYS.LANGUAGE) || DEFAULT_LANGUAGE;
     
-    // Inclure la langue dans les données utilisateur
     const userData = {
       email: cleanEmail,
       language: currentLanguage
     };
 
     console.log(`Envoi de demande de réinitialisation pour ${cleanEmail} en langue ${currentLanguage}`);
-
-    // Déclenche l'action pour réinitialiser le mot de passe
     dispatch(resetPassword(userData));
   };
 
   useEffect(() => {
     if (isError) {
-      toast.error(message);  // Affichage de l'erreur si l'API retourne une erreur
+      setError(message);
       setShowConfirmation(false);
     }
     if (isSuccess) {
-      toast.success(translations.successMessage);  // Message de succès
-      setEmail(''); // Réinitialiser le champ email
-      setShowConfirmation(true); // Afficher le message de confirmation
+      setEmail('');
+      setShowConfirmation(true);
+      setError('');
     }
 
-    // Réinitialiser l'état de l'authentification pour éviter la persistance d'anciens états
     dispatch(reset());
-  }, [isError, isSuccess, message, dispatch, translations]);
+  }, [isError, isSuccess, message, dispatch]);
 
   return (
     <>
@@ -225,7 +184,22 @@ const ResetPasswordPage = () => {
           </div>
         </div>
 
-        {/* Affichage conditionnel du Spinner ou du formulaire */}
+        {error && (
+          <GeneralMessage
+            type="error"
+            message={error}
+            onClose={() => setError('')}
+          />
+        )}
+
+        {showConfirmation && (
+          <GeneralMessage
+            type="success"
+            message={translations.successMessage}
+            onClose={() => setShowConfirmation(false)}
+          />
+        )}
+
         {isLoading ? (
           <div className="flex justify-center items-center mt-10">
             <Spinner loading={isLoading} />
@@ -254,31 +228,6 @@ const ResetPasswordPage = () => {
                 </span>
               </Button>
             </div>
-            {showConfirmation && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6 p-4 bg-green-600 text-white rounded-lg shadow-md"
-              >
-                <div className="flex items-start">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <div>
-                    <p className="font-medium">{translations.successMessage}</p>
-                    <button 
-                      onClick={() => setShowConfirmation(false)} 
-                      className="absolute top-3 right-3 text-white"
-                      aria-label="Fermer"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
           </form>
         )}
       </AuthLayout>
