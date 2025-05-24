@@ -156,6 +156,13 @@ export const authTranslations = Object.assign({
         genericError: 'An error occurred. Please try again.',
       },
     },
+    passwordStrength: {
+      veryWeak: 'Very weak',
+      weak: 'Weak',
+      medium: 'Medium',
+      strong: 'Strong',
+      strength: 'Strength'
+    },
   },
   fr: {
     emailVerification: {
@@ -337,6 +344,13 @@ export const authTranslations = Object.assign({
         genericError: 'Une erreur est survenue. Veuillez réessayer.',
       },
     },
+    passwordStrength: {
+      veryWeak: 'Très faible',
+      weak: 'Faible',
+      medium: 'Moyen',
+      strong: 'Fort',
+      strength: 'Force'
+    },
   },
   es: {
     emailVerification: {
@@ -441,6 +455,13 @@ export const authTranslations = Object.assign({
         genericError: 'Ha ocurrido un error. Por favor, inténtelo de nuevo.',
       },
     },
+    passwordStrength: {
+      veryWeak: 'Muy débil',
+      weak: 'Débil',
+      medium: 'Medio',
+      strong: 'Fuerte',
+      strength: 'Fuerza'
+    },
   },
   de: {
     emailVerification: {
@@ -544,7 +565,14 @@ export const authTranslations = Object.assign({
         passwordsDoNotMatch: 'Passwörter stimmen nicht überein',
         genericError: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.',
       },
-    }
+    },
+    passwordStrength: {
+      veryWeak: 'Sehr schwach',
+      weak: 'Schwach',
+      medium: 'Mittel',
+      strong: 'Stark',
+      strength: 'Stärke'
+    },
   }
 }
 );

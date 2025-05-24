@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Composant de champ de mot de passe avec indicateur de force et visibilité
@@ -17,6 +18,7 @@ const PasswordField = ({
   showStrengthMeter = true,
   label,
 }) => {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
@@ -56,10 +58,10 @@ const PasswordField = ({
   
   // Détermine le label de force du mot de passe
   const getStrengthLabel = () => {
-    if (strength < 25) return 'Très faible';
-    if (strength < 50) return 'Faible';
-    if (strength < 75) return 'Moyen';
-    return 'Fort';
+    if (strength < 25) return t('passwordStrength.veryWeak');
+    if (strength < 50) return t('passwordStrength.weak');
+    if (strength < 75) return t('passwordStrength.medium');
+    return t('passwordStrength.strong');
   };
 
   return (
@@ -123,7 +125,7 @@ const PasswordField = ({
             />
           </div>
           <p className="mt-1 text-xs text-gray-500 flex justify-between">
-            <span>Force: {getStrengthLabel()}</span>
+            <span>{t('passwordStrength.strength')}: {getStrengthLabel()}</span>
           </p>
         </div>
       )}
