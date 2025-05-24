@@ -4,7 +4,6 @@ import { ClipLoader } from 'react-spinners';
 import { HiCheck, HiX } from 'react-icons/hi';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
 
 /**
  * A button component that shows loading and success states for form submissions
@@ -160,6 +159,18 @@ const SubmitButton = ({
     };
   }, [state, resetDelay]);
   
+  // Ajout : reset automatique de l'état après une erreur (comme pour le succès)
+  useEffect(() => {
+    if (isControlled && externalError) {
+      const timer = setTimeout(() => {
+        setShowProgressBar(false);
+        setProgressWidth(100);
+        if (onResetRequest) onResetRequest();
+      }, resetDelay);
+      return () => clearTimeout(timer);
+    }
+  }, [isControlled, externalError, onResetRequest, resetDelay]);
+  
   // Base styles with original dimensions
   const baseStyles = 'group relative inline-flex items-center justify-between rounded-lg py-2 px-4 text-sm font-medium focus:outline-none transition-all duration-200 ease-in-out overflow-hidden';
   
@@ -268,7 +279,7 @@ const SubmitButton = ({
   return (
     <div className="flex flex-col items-start w-full">
       <motion.button
-        className={buttonStyles}
+        className={buttonStyles + ' relative overflow-hidden'}
         onClick={handleClick}
         disabled={state === 'loading'}
         whileTap={{ scale: 0.98 }}
@@ -292,7 +303,25 @@ const SubmitButton = ({
         }
         {...props}
       >
-        <div className="flex w-full items-center justify-between px-2">
+        {/* Barre blanche de fond + barre de progression bleue */}
+        {showProgressBar && (
+          <div className="absolute bottom-0 left-0 w-full h-1 pointer-events-none" style={{zIndex:2}}>
+            {/* Barre blanche de fond */}
+            <div className="absolute left-0 top-0 w-full h-full bg-white"></div>
+            {/* Barre bleue de progression */}
+            <motion.div 
+              className="absolute left-0 top-0 h-full bg-blue-600"
+              style={{ 
+                width: `${progressWidth}%`,
+                transition: `width ${resetDelay}ms linear`
+              }}
+              initial={{ opacity: 0.8 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
+        )}
+        <div className="flex w-full items-center justify-center px-2 relative" style={{zIndex:3}}>
           <span className="font-medium text-left">
             {state === 'success' ? finalSuccessText : (showErrorMessage && state === 'error' ? finalErrorText : finalText)}
           </span>
@@ -331,75 +360,11 @@ const SubmitButton = ({
             )}
             
             {state === 'default' && (
-              <ArrowRight className="h-3.5 w-3.5 opacity-60" strokeWidth={2} />
+              null
             )}
           </div>
         </div>
-        
-        {/* Progress bar with dark blue color */}
-        {showProgressBar && (
-          <div className="absolute bottom-0 left-0 h-1 w-full bg-black bg-opacity-10">
-            <motion.div 
-              className="h-full bg-blue-700"
-              style={{ 
-                width: `${progressWidth}%`,
-                transition: `width ${resetDelay}ms linear`
-              }}
-              initial={{ opacity: 0.8 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            />
-          </div>
-        )}
       </motion.button>
-      
-      <AnimatePresence>
-        {state === 'success' && (
-          <motion.div 
-            className="text-sm text-green-600 w-full flex items-center mt-1"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ type: "spring", stiffness: 100, damping: 15 }}
-          >
-            <motion.svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-4 w-4 mr-2 text-green-600"
-              viewBox="0 0 20 20" 
-              fill="currentColor"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-            >
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </motion.svg>
-            <span>{successMessage || t('security.passwordUpdatedSuccess')}</span>
-          </motion.div>
-        )}
-        
-        {showErrorMessage && state === 'error' && errorMessage && (
-          <motion.div 
-            className="text-sm text-red-600 w-full flex items-center mt-1"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ type: "spring", stiffness: 100, damping: 15 }}
-          >
-            <motion.svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-4 w-4 mr-2 text-red-600"
-              viewBox="0 0 20 20" 
-              fill="currentColor"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-            >
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </motion.svg>
-            <span>{formatErrorMessage(errorMessage)}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
