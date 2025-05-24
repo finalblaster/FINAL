@@ -49,8 +49,8 @@ const navigation = (t) => ({
     { name: t('footer.press', 'Press'), href: '#' },
   ],
   legal: [
-    { name: t('footer.terms', 'Terms of service'), href: '/terms', onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
-    { name: t('footer.privacy', 'Privacy policy'), href: '/privacy', onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+    { name: t('footer.terms', 'Terms of service'), href: '/terms' },
+    { name: t('footer.privacy', 'Privacy policy'), href: '/privacy' },
   ],
 });
 
@@ -153,7 +153,17 @@ const Footer = ({ className = "bg-transparent" }) => {
               <ul role="list" className="space-y-2">
                 {nav.legal.map((item) => (
                   <li key={item.name}>
-                    <Link to={item.href} onClick={item.onClick} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                    <Link 
+                      to={item.href} 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        setTimeout(() => {
+                          window.location.href = item.href;
+                        }, 100);
+                      }}
+                      className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                    >
                       {item.name}
                     </Link>
                   </li>
