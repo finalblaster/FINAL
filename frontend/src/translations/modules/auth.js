@@ -25,6 +25,7 @@ export const authTranslations = Object.assign({
       submitButton: 'Log in',
       forgotPassword: 'Forgot your password?',
       successMessage: 'You are now logged in!',
+      verificationEmailSentWithSpam: 'A verification email has been sent. Please check your inbox and spam folder.',
       verificationEmailSent: 'A verification email has been sent to your address. Please check your inbox and confirm your email address before logging in.',
       errors: {
         emailRequired: 'Email address is required',
@@ -181,6 +182,8 @@ export const authTranslations = Object.assign({
       subtitle: 'Vous n\'avez pas de compte ?',
       forTrial: 'pour un essai gratuit.',
       forgotPassword: 'Mot de passe oublié ?',
+      verificationEmailSentWithSpam: 'Un email de vérification a été envoyé. Veuillez vérifier votre boîte de réception et vos spams.',
+      verificationEmailSent: 'Un email de vérification a été envoyé à votre adresse. Veuillez vérifier votre boîte de réception et confirmer votre adresse email avant de vous connecter.',
       footer: {
         terms: 'Conditions d\'utilisation',
         privacy: 'Politique de confidentialité',
@@ -189,7 +192,6 @@ export const authTranslations = Object.assign({
       },
       rememberMe: 'Se souvenir de moi',
       successMessage: 'Vous êtes maintenant connecté',
-      verificationEmailSent: 'Un email de vérification a été envoyé à votre adresse. Veuillez vérifier votre boîte de réception et confirmer votre adresse email avant de vous connecter.',
       errors: {
         emailRequired: 'L\'adresse email est obligatoire',
         emailInvalid: 'L\'adresse email n\'est pas valide',
@@ -364,6 +366,7 @@ export const authTranslations = Object.assign({
       emailPlaceholder: 'Ingrese su correo electrónico',
       passwordPlaceholder: 'Ingrese su contraseña',
       successMessage: '¡Ha iniciado sesión correctamente!',
+      verificationEmailSentWithSpam: 'Se ha enviado un correo de verificación. Por favor, revise su bandeja de entrada y carpeta de spam.',
       verificationEmailSent: 'Se ha enviado un correo electrónico de verificación a su dirección. Por favor, compruebe su bandeja de entrada y confirme su dirección de correo electrónico antes de iniciar sesión.',
       errors: {
         emailRequired: 'El correo electrónico es obligatorio',
@@ -455,6 +458,7 @@ export const authTranslations = Object.assign({
       emailPlaceholder: 'Geben Sie Ihre E-Mail-Adresse ein',
       passwordPlaceholder: 'Geben Sie Ihr Passwort ein',
       successMessage: 'Sie sind jetzt angemeldet!',
+      verificationEmailSentWithSpam: 'Eine Bestätigungsmail wurde gesendet. Bitte überprüfen Sie Ihren Posteingang und Spam-Ordner.',
       verificationEmailSent: 'Eine Bestätigungsmail wurde an Ihre Adresse gesendet. Bitte überprüfen Sie Ihren Posteingang und bestätigen Sie Ihre E-Mail-Adresse, bevor Sie sich anmelden.',
       errors: {
         emailRequired: 'E-Mail-Adresse ist erforderlich',

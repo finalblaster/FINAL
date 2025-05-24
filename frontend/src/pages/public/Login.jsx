@@ -55,9 +55,10 @@ const Login = () => {
   useEffect(() => {
     if (isError) {
       if (message === 'INACTIVE_ACCOUNT') {
-        // Compte inactif, montrer l'alerte de vérification
+        // Compte inactif, montrer l'alerte de vérification avec bouton de renvoi
         setShowVerificationAlert(true);
         setVerificationEmail(email);
+        setShowActivationSent(false);
       } else if (message === 'INVALID_CREDENTIALS' || 
           message.includes('401') || 
           message.includes('no refresh token available') || 
@@ -112,12 +113,8 @@ const Login = () => {
         }));
       }
       
-      setShowVerificationAlert(true);
-      
-      toast.info(t('login.verificationEmailSent'), {
-        autoClose: 8000,
-        position: "top-center"
-      });
+      setShowActivationSent(true);
+      setShowVerificationAlert(false);
       
       window.history.replaceState({}, document.title);
     }
@@ -308,9 +305,16 @@ const Login = () => {
             <h2 className="text-lg font-semibold text-gray-900">{t('login.title')}</h2>
             <p className="mt-2 text-sm text-gray-700">
               {currentLanguage === 'fr' ? t('login.subtitle') : t('login.noAccount')}{' '}
-              <CustomLink to="/register" className="font-medium text-blue-600 hover:underline">
+              <Link 
+                to="/register" 
+                className="font-medium text-blue-600 hover:underline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/register');
+                }}
+              >
                 {currentLanguage === 'fr' ? t('login.createAccount') : t('login.registerLink')}
-              </CustomLink>{' '}
+              </Link>{' '}
               {t('login.forTrial')}
             </p>
           </motion.div>
@@ -349,7 +353,7 @@ const Login = () => {
             <GeneralMessage
               type="success"
               onClose={() => setShowActivationSent(false)}
-              message={t('login.activationLinkSent')}
+              message={t('login.verificationEmailSentWithSpam')}
             />
           )}
         </motion.div>
