@@ -163,6 +163,9 @@ msgstr "Bitte besuchen Sie folgende Seite, um ein neues Passwort festzulegen:"
 msgid "Votre nom d'utilisateur, au cas où vous l'auriez oublié : %(username)s"
 msgstr "Ihr Benutzername, falls Sie ihn vergessen haben: %(username)s"
 
+msgid "Votre nom d'utilisateur, au cas où vous l'auriez oublié :"
+msgstr "Ihr Benutzername, falls Sie ihn vergessen haben:"
+
 msgid "Réinitialisation de votre mot de passe"
 msgstr "Zurücksetzung Ihres Passworts"
 

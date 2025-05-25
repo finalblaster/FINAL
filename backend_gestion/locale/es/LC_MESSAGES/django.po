@@ -163,6 +163,9 @@ msgstr "Por favor, vaya a la siguiente página para elegir una nueva contraseña
 msgid "Votre nom d'utilisateur, au cas où vous l'auriez oublié : %(username)s"
 msgstr "Su nombre de usuario, en caso de que lo haya olvidado: %(username)s"
 
+msgid "Votre nom d'utilisateur, au cas où vous l'auriez oublié :"
+msgstr "Su nombre de usuario, en caso de que lo haya olvidado:"
+
 msgid "Réinitialisation de votre mot de passe"
 msgstr "Restablecimiento de su contraseña"
 
