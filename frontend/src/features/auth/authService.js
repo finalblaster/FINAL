@@ -792,7 +792,10 @@ class AuthService {
           for (const msg of data.email) {
             if (typeof msg === 'string' && 
                 (msg.toLowerCase().includes('existe déjà') || 
-                 msg.toLowerCase().includes('already exists'))) {
+                 msg.toLowerCase().includes('already exists') ||
+                 msg.toLowerCase().includes('ya existe usuario con este email') ||
+                 msg.toLowerCase().includes('existiert bereits') ||
+                 msg.toLowerCase().includes('ist bereits vergeben'))) {
               return "EMAIL_ALREADY_EXISTS";
             }
           }
@@ -803,7 +806,10 @@ class AuthService {
           for (const msg of data.current_password) {
             if (typeof msg === 'string' && 
                 (msg.toLowerCase().includes('mot de passe invalide') || 
-                 msg.toLowerCase().includes('invalid password'))) {
+                 msg.toLowerCase().includes('invalid password') ||
+                 msg.toLowerCase().includes('contraseña inválida') ||
+                 msg.toLowerCase().includes('ungültiges passwort') ||
+                 msg.toLowerCase().includes('falsches passwort'))) {
               return "CURRENT_PASSWORD_INCORRECT";
             }
           }
@@ -812,13 +818,26 @@ class AuthService {
         // Vérifier dans detail ou autres champs génériques
         if (data.detail && typeof data.detail === 'string') {
           const detail = data.detail.toLowerCase();
-          if (detail.includes('existe déjà') || detail.includes('already exists')) {
+          if (detail.includes('existe déjà') || 
+              detail.includes('already exists') ||
+              detail.includes('ya existe usuario con este email') ||
+              detail.includes('existiert bereits') ||
+              detail.includes('ist bereits vergeben')) {
             return "EMAIL_ALREADY_EXISTS";
           }
-          if (detail.includes('mot de passe invalide') || detail.includes('invalid password')) {
+          if (detail.includes('mot de passe invalide') || 
+              detail.includes('invalid password') ||
+              detail.includes('contraseña inválida') ||
+              detail.includes('ungültiges passwort') ||
+              detail.includes('falsches passwort')) {
             return "CURRENT_PASSWORD_INCORRECT";
           }
-          if (detail.includes('incorrect') || detail.includes('invalid')) {
+          if (detail.includes('incorrect') || 
+              detail.includes('invalid') ||
+              detail.includes('incorrecto') ||
+              detail.includes('inválido') ||
+              detail.includes('ungültig') ||
+              detail.includes('falsch')) {
             return "INVALID_CREDENTIALS";
           }
         }
@@ -831,7 +850,9 @@ class AuthService {
               if (lowerMsg.includes('incorrect') || 
                   lowerMsg.includes('invalid') || 
                   lowerMsg.includes('incorrecte') || 
-                  lowerMsg.includes('invalide')) {
+                  lowerMsg.includes('invalide') ||
+                  lowerMsg.includes('ungültig') ||
+                  lowerMsg.includes('falsch')) {
                 return "INVALID_CREDENTIALS";
               }
             }

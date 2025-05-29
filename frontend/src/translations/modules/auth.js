@@ -462,6 +462,42 @@ export const authTranslations = Object.assign({
       strong: 'Fuerte',
       strength: 'Fuerza'
     },
+    register: {
+      pageTitle: 'Registro - {{siteName}}',
+      title: 'Crear cuenta',
+      alreadyAccount: '¿Ya tienes una cuenta?',
+      loginLink: 'Iniciar sesión',
+      firstNameLabel: 'Nombre',
+      lastNameLabel: 'Apellido',
+      emailLabel: 'Correo electrónico',
+      passwordLabel: 'Contraseña',
+      confirmPasswordLabel: 'Confirmar contraseña',
+      submitButton: 'Registrarse',
+      successMessage: '¡Registro exitoso! Ahora puedes iniciar sesión.',
+      errors: {
+        nameRequired: 'El nombre es obligatorio',
+        nameTooShort: 'El nombre debe tener al menos 2 caracteres',
+        nameTooLong: 'El nombre es demasiado largo',
+        emailRequired: 'El correo electrónico es obligatorio',
+        emailInvalid: 'El correo electrónico no es válido',
+        emailAlreadyExists: 'Ya existe un usuario con esta dirección de correo electrónico',
+        passwordRequired: 'La contraseña es obligatoria',
+        passwordLength: 'La contraseña debe tener al menos 8 caracteres',
+        passwordComplexity: 'La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial',
+        passwordsDoNotMatch: 'Las contraseñas no coinciden',
+        termsNotAccepted: 'Debes aceptar los términos de uso',
+        serverError: 'Se ha producido un error durante el registro. Por favor, inténtalo de nuevo más tarde',
+        serverErrors: {
+          emailExists: 'Ya existe Usuario con este Email Adress.',
+          emailExistsSuggestion: 'Puedes iniciar sesión o restablecer tu contraseña si la olvidaste',
+          invalidCredentials: 'Correo electrónico o contraseña inválidos',
+          serverError: 'Se ha producido un error. Por favor, inténtalo de nuevo más tarde',
+          networkError: 'Problema de conexión. Inténtalo de nuevo más tarde.',
+          validationError: 'Por favor revisa tus datos e inténtalo de nuevo',
+          tooManyAttempts: 'Demasiados intentos. Por favor, inténtalo más tarde'
+        }
+      }
+    },
   },
   de: {
     emailVerification: {
@@ -572,6 +608,42 @@ export const authTranslations = Object.assign({
       medium: 'Mittel',
       strong: 'Stark',
       strength: 'Stärke'
+    },
+    register: {
+      pageTitle: 'Registrierung - {{siteName}}',
+      title: 'Konto erstellen',
+      alreadyAccount: 'Haben Sie bereits ein Konto?',
+      loginLink: 'Anmelden',
+      firstNameLabel: 'Vorname',
+      lastNameLabel: 'Nachname',
+      emailLabel: 'E-Mail-Adresse',
+      passwordLabel: 'Passwort',
+      confirmPasswordLabel: 'Passwort bestätigen',
+      submitButton: 'Registrieren',
+      successMessage: 'Registrierung erfolgreich! Sie können sich jetzt anmelden.',
+      errors: {
+        nameRequired: 'Der Name ist erforderlich',
+        nameTooShort: 'Der Name muss mindestens 2 Zeichen lang sein',
+        nameTooLong: 'Der Name ist zu lang',
+        emailRequired: 'E-Mail-Adresse ist erforderlich',
+        emailInvalid: 'E-Mail-Adresse ist ungültig',
+        emailAlreadyExists: 'Diese E-Mail-Adresse wird bereits verwendet',
+        passwordRequired: 'Passwort ist erforderlich',
+        passwordLength: 'Das Passwort muss mindestens 8 Zeichen lang sein',
+        passwordComplexity: 'Das Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten',
+        passwordsDoNotMatch: 'Passwörter stimmen nicht überein',
+        termsNotAccepted: 'Sie müssen den Nutzungsbedingungen zustimmen',
+        serverError: 'Bei der Registrierung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut',
+        serverErrors: {
+          emailExists: 'Diese E-Mail-Adresse ist bereits registriert',
+          emailExistsSuggestion: 'Sie können sich anmelden oder Ihr Passwort zurücksetzen, wenn Sie es vergessen haben',
+          invalidCredentials: 'Ungültige E-Mail oder Passwort',
+          serverError: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut',
+          networkError: 'Verbindungsproblem. Bitte versuchen Sie es später erneut.',
+          validationError: 'Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut',
+          tooManyAttempts: 'Zu viele Versuche. Bitte versuchen Sie es später erneut'
+        }
+      }
     },
   }
 }

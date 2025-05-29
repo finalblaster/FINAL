@@ -105,7 +105,8 @@ export const register = createAsyncThunk(
                     for (const msg of data.email) {
                         if (typeof msg === 'string' && 
                             (msg.toLowerCase().includes('existe déjà') || 
-                             msg.toLowerCase().includes('already exists'))) {
+                             msg.toLowerCase().includes('already exists') ||
+                             msg.toLowerCase().includes('ya existe usuario con este email'))) {
                             return thunkAPI.rejectWithValue('EMAIL_ALREADY_EXISTS');
                         }
                     }
@@ -114,7 +115,9 @@ export const register = createAsyncThunk(
                 // Vérifier dans detail ou autres champs génériques
                 if (data.detail && typeof data.detail === 'string') {
                     const detail = data.detail.toLowerCase();
-                    if (detail.includes('existe déjà') || detail.includes('already exists')) {
+                    if (detail.includes('existe déjà') || 
+                        detail.includes('already exists') ||
+                        detail.includes('ya existe usuario con este email')) {
                         return thunkAPI.rejectWithValue('EMAIL_ALREADY_EXISTS');
                     }
                 }
