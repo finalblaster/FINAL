@@ -5,8 +5,8 @@ export const assistantTranslations = {
     processing: "Je traite votre demande. Comment puis-je vous aider davantage ?",
     inputPlaceholder: "Tapez votre message ici...",
     sendButton: "Envoyer",
-    "assistant.title": "Assistant IA",
-    "assistant.subtitle": "Votre assistant intelligent"
+    "aiAssistant.title": "Assistant IA",
+    "aiAssistant.subtitle": "Votre assistant intelligent"
   },
   en: {
     pageTitle: "AI Assistant",
@@ -23,8 +23,8 @@ export const assistantTranslations = {
     processing: "Estoy procesando tu solicitud. ¿En qué más puedo ayudarte?",
     inputPlaceholder: "Escribe tu mensaje aquí...",
     sendButton: "Enviar",
-    "assistant.title": "Asistente IA",
-    "assistant.subtitle": "Tu asistente inteligente"
+    "aiAssistant.title": "Asistente IA",
+    "aiAssistant.subtitle": "Tu asistente inteligente"
   },
   de: {
     pageTitle: "KI-Assistent",
@@ -32,7 +32,7 @@ export const assistantTranslations = {
     processing: "Ich verarbeite Ihre Anfrage. Wie kann ich Ihnen weiterhelfen?",
     inputPlaceholder: "Geben Sie Ihre Nachricht hier ein...",
     sendButton: "Senden",
-    "assistant.title": "KI-Assistent",
-    "assistant.subtitle": "Ihr intelligenter Assistent"
+    "aiAssistant.title": "KI-Assistent",
+    "aiAssistant.subtitle": "Ihr intelligenter Assistent"
   }
 }; 

@@ -16,7 +16,7 @@ const PageHeader = ({ title, subtitle, icon: Icon, action }) => {
   return (
     <div className="mb-6 flex justify-between items-center">
       <div className="flex items-center">
-        <div className="mr-4 bg-indigo-600 p-2.5 rounded-lg shadow-sm">
+        <div className="mr-4 bg-blue-600 p-2.5 rounded-lg shadow-sm">
           <Icon className="h-6 w-6 text-white" />
         </div>
         <div>
