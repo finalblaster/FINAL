@@ -199,10 +199,22 @@ const Login = () => {
         }
       } catch (error) {
         console.error('Erreur lors du login:', error);
-        setErrors({
-          email: t('login.errors.invalidCredentials'),
-          password: t('login.errors.invalidCredentials')
-        });
+        // Vérifier si c'est une erreur réseau, CORS ou serveur down
+        if (error.message === 'NetworkError when attempting to fetch resource' || 
+            error.message.includes('CORS') || 
+            error.message.includes('Cross-Origin') ||
+            error.message.includes('Failed to fetch') ||
+            error.message.includes('Blocage d\'une requête multiorigine') ||
+            error.message.includes('Network request failed') ||
+            error.message.includes('Unable to connect') ||
+            error.message.includes('Server is not responding')) {
+          setGeneralError(t('login.errors.networkError'));
+          setErrors({}); // Effacer les erreurs de validation
+        } else {
+          // Pour toute autre erreur non gérée, afficher un message général
+          setGeneralError(t('login.errors.generalError'));
+          setErrors({}); // Effacer les erreurs de validation
+        }
       }
     }
   };

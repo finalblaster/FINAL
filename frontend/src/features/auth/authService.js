@@ -775,8 +775,14 @@ class AuthService {
       return error.message;
     }
 
-    // Pas de connexion internet
-    if (!navigator.onLine || error.message === 'Network Error') {
+    // Gestion des erreurs réseau et CORS
+    if (!navigator.onLine || 
+        error.message === 'Network Error' || 
+        error.message === 'NetworkError when attempting to fetch resource' ||
+        error.message.includes('CORS') ||
+        error.message.includes('Cross-Origin') ||
+        error.message.includes('Failed to fetch')) {
+      console.error("Erreur réseau détectée:", error.message);
       return "NETWORK_ERROR";
     }
 
@@ -888,7 +894,8 @@ class AuthService {
     }
 
     // Erreur par défaut
-    return "UNKNOWN_ERROR";
+    console.error("Erreur non gérée:", error);
+    return "NETWORK_ERROR";
   }
 }
 
