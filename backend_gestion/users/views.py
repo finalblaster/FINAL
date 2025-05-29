@@ -328,10 +328,11 @@ class CustomUserViewSet(UserViewSet):
         from django.contrib.auth.tokens import default_token_generator
         
         try:
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
-        encoded_email = urlsafe_base64_encode(force_bytes(new_email))
-        
+            # Génération du token
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            encoded_email = urlsafe_base64_encode(force_bytes(new_email))
+            
             logger.debug(f"Token généré - UID: {uid}, Token: {token}, Encoded Email: {encoded_email}")
             
             # Vérifier que le token est valide immédiatement
@@ -340,55 +341,55 @@ class CustomUserViewSet(UserViewSet):
                 return Response({"detail": "Erreur lors de la génération du token de confirmation."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             # Préparer l'URL de confirmation
-        confirmation_url = f"email/activate/{uid}/{token}/{encoded_email}"
+            confirmation_url = f"email/activate/{uid}/{token}/{encoded_email}"
             logger.debug(f"URL de confirmation générée: {confirmation_url}")
-        
-        # Envoyer un email de vérification à la nouvelle adresse
-        try:
+            
+            # Envoyer un email de vérification à la nouvelle adresse
+            try:
                 logger.debug("=== PRÉPARATION DE L'EMAIL ===")
                 from django.core.mail import EmailMessage
-            from django.template.loader import render_to_string
-            from django.utils.translation import gettext as _
-            
-            # Définir le contexte pour les templates d'email
-            context = {
-                'user': user,
-                'site_name': settings.SITE_NAME,
-                'domain': settings.DOMAIN,
-                'protocol': 'https' if request.is_secure() else 'http',
-                'url': confirmation_url,
-                'current_language': language,
+                from django.template.loader import render_to_string
+                from django.utils.translation import gettext as _
+                
+                # Définir le contexte pour les templates d'email
+                context = {
+                    'user': user,
+                    'site_name': settings.SITE_NAME,
+                    'domain': settings.DOMAIN,
+                    'protocol': 'https' if request.is_secure() else 'http',
+                    'url': confirmation_url,
+                    'current_language': language,
                     'user_language': language,
                     'old_email': old_email,
                     'new_email': new_email
-            }
+                }
                 
                 logger.debug(f"Contexte pour l'email: {context}")
-            
-            # Avec l'override de langue, créer et envoyer l'email de vérification
-            with translation.override(language):
+                
+                # Avec l'override de langue, créer et envoyer l'email de vérification
+                with translation.override(language):
                     try:
                         # 1. Email de confirmation à la nouvelle adresse
                         logger.debug("Tentative de rendu du template HTML pour la nouvelle adresse")
-                html_body = render_to_string('email/activation_changement_username.html', context)
-                logger.debug("Template HTML rendu avec succès")
-                
-                subject = extract_subject_from_html(html_body)
+                        html_body = render_to_string('email/activation_changement_username.html', context)
+                        logger.debug("Template HTML rendu avec succès")
+                        
+                        subject = extract_subject_from_html(html_body)
                         logger.debug(f"Sujet final de l'email: {subject}")
-                
-                from_email = settings.DEFAULT_FROM_EMAIL
+                        
+                        from_email = settings.DEFAULT_FROM_EMAIL
                         logger.debug(f"Email sera envoyé depuis: {from_email}")
-                
+                        
                         # Email de confirmation à la nouvelle adresse
-                email = EmailMessage(
-                    subject=subject,
-                    body=html_body,
-                    from_email=from_email,
-                    to=[new_email],
-                )
+                        email = EmailMessage(
+                            subject=subject,
+                            body=html_body,
+                            from_email=from_email,
+                            to=[new_email],
+                        )
                         email.content_subtype = "html"
-                email.send()
-                logger.info(f"Email de vérification pour changement d'adresse envoyé à {new_email}")
+                        email.send()
+                        logger.info(f"Email de vérification pour changement d'adresse envoyé à {new_email}")
                         
                         # 2. Email d'alerte à l'ancienne adresse
                         alert_context = {
@@ -420,16 +421,16 @@ class CustomUserViewSet(UserViewSet):
                         logger.error(f"Erreur lors du rendu du template: {str(template_error)}", exc_info=True)
                         return Response({"detail": "Erreur lors de la préparation des emails."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                         
-        except Exception as e:
-            logger.error(f"Erreur lors de l'envoi de l'email de vérification: {str(e)}", exc_info=True)
-            return Response({"detail": "Erreur lors de l'envoi de l'email de vérification."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            except Exception as e:
+                logger.error(f"Erreur lors de l'envoi de l'email de vérification: {str(e)}", exc_info=True)
+                return Response({"detail": "Erreur lors de l'envoi de l'email de vérification."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
             logger.debug("=== FIN DU PROCESSUS DE CHANGEMENT D'EMAIL ===")
-        # Retourner une réponse indiquant que le processus de changement a été initié
-        return Response({
-            "detail": "Un email de vérification a été envoyé à votre nouvelle adresse. Veuillez cliquer sur le lien dans cet email pour confirmer le changement.",
-            "pending_email": new_email
-        }, status=status.HTTP_200_OK)
+            # Retourner une réponse indiquant que le processus de changement a été initié
+            return Response({
+                "detail": "Un email de vérification a été envoyé à votre nouvelle adresse. Veuillez cliquer sur le lien dans cet email pour confirmer le changement.",
+                "pending_email": new_email
+            }, status=status.HTTP_200_OK)
             
         except Exception as e:
             logger.error(f"Erreur lors de la génération du token: {str(e)}", exc_info=True)
@@ -873,8 +874,8 @@ def activate_email_change(request):
         
         # Décoder l'UID et l'email
         try:
-        user_id = force_str(urlsafe_base64_decode(uid))
-        new_email = force_str(urlsafe_base64_decode(encoded_email))
+            user_id = force_str(urlsafe_base64_decode(uid))
+            new_email = force_str(urlsafe_base64_decode(encoded_email))
             logger.debug(f"Données décodées - user_id: {user_id}, new_email: {new_email}")
         except Exception as decode_error:
             logger.error(f"Erreur lors du décodage des données: {str(decode_error)}")
@@ -884,7 +885,7 @@ def activate_email_change(request):
             )
         
         try:
-        user = User.objects.get(pk=user_id)
+            user = User.objects.get(pk=user_id)
             logger.debug(f"Utilisateur trouvé: {user.email}")
         except User.DoesNotExist:
             logger.error(f"Utilisateur non trouvé avec l'ID: {user_id}")
@@ -926,32 +927,32 @@ def activate_email_change(request):
             logger.debug(f"USERNAME_FIELD mis à jour pour l'utilisateur {user.id}")
         
         # Envoyer un email de confirmation finale à la nouvelle adresse
-            try:
-                from django.core.mail import EmailMultiAlternatives
-                from django.template.loader import render_to_string
-                from django.utils.translation import gettext as _
-                
-                context = {
-                    'user': user,
-                    'old_email': old_email,
-                    'new_email': new_email,
-                    'site_name': settings.SITE_NAME,
-                    'domain': settings.DOMAIN,
-                    'protocol': 'https' if request.is_secure() else 'http',
-                    'current_language': language,
-                    'user_language': language
-                }
-                
-                with translation.override(language):
-                    html_body = render_to_string('email/username_changed_confirmation_email.html', context)
-                    subject = extract_subject_from_html(html_body)
+        try:
+            from django.core.mail import EmailMultiAlternatives
+            from django.template.loader import render_to_string
+            from django.utils.translation import gettext as _
+            
+            context = {
+                'user': user,
+                'old_email': old_email,
+                'new_email': new_email,
+                'site_name': settings.SITE_NAME,
+                'domain': settings.DOMAIN,
+                'protocol': 'https' if request.is_secure() else 'http',
+                'current_language': language,
+                'user_language': language
+            }
+            
+            with translation.override(language):
+                html_body = render_to_string('email/username_changed_confirmation_email.html', context)
+                subject = extract_subject_from_html(html_body)
                 logger.debug(f"Sujet de la confirmation finale: {subject}")
                 
                 email = EmailMultiAlternatives(subject, "", settings.DEFAULT_FROM_EMAIL, to=[new_email])
-                    email.attach_alternative(html_body, "text/html")
-                    email.send()
+                email.attach_alternative(html_body, "text/html")
+                email.send()
                 logger.info(f"Email de confirmation finale envoyé à {new_email}")
-                    
+                
         except Exception as email_error:
             logger.error(f"Erreur lors de l'envoi de l'email de confirmation finale: {str(email_error)}")
             # Ne pas bloquer le processus si l'envoi d'email échoue
