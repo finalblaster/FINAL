@@ -29,3 +29,37 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    def get_properties(self):
+        """
+        Retourne toutes les propriétés de l'utilisateur.
+        """
+        return self.properties.all()
+
+    def get_active_properties(self):
+        """
+        Retourne les propriétés actives de l'utilisateur.
+        """
+        return self.properties.filter(is_active=True)
+
+    def add_property(self, **kwargs):
+        """
+        Ajoute une nouvelle propriété à l'utilisateur.
+        """
+        from properties.models import Property
+        return Property.objects.create(owner=self, **kwargs)
+
+    def has_property(self, property_id):
+        """
+        Vérifie si l'utilisateur possède une propriété spécifique.
+        """
+        return self.properties.filter(id=property_id).exists()
+
+    def get_property_info_entries(self, property_id=None):
+        """
+        Retourne toutes les entrées d'information des propriétés de l'utilisateur.
+        Si property_id est spécifié, retourne uniquement les entrées de cette propriété.
+        """
+        if property_id:
+            return self.properties.get(id=property_id).info_entries.all()
+        return self.properties.prefetch_related('info_entries').all()

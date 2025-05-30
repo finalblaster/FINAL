@@ -10,6 +10,7 @@ import PageHeader from '../../components/PageHeader';
 import SubmitButton from '../../components/SubmitButton';
 import FormField from '../../components/FormField';
 import GeneralMessage from '../../components/GeneralMessage';
+import SectionBlock from '../../components/shared/SectionBlock';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import PhoneInput from 'react-phone-input-2';
@@ -1045,549 +1046,470 @@ const Settings = () => {
         icon={SettingsIcon}
       />
       
-      <div className="bg-white shadow rounded-lg">
-        <div className="flex flex-col md:flex-row">
-          {/* Sidebar - Vertical on desktop */}
-          <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-gray-200">
-            {/* Horizontal tabs for mobile */}
-            <div className="md:hidden overflow-x-auto">
-              <div className="flex flex-row p-2 whitespace-nowrap">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => handleTabChange(tab.id)}
-                    className={`flex items-center p-3 rounded-lg mr-2 ${
-                      activeTab === tab.id 
-                        ? 'bg-blue-50 text-blue-600' 
-                        : 'text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    <tab.icon className={`h-5 w-5 mr-2 ${
-                      activeTab === tab.id ? 'text-blue-600' : 'text-gray-500'
-                    }`} />
-                    <span className="text-sm">{tab.name}</span>
-                  </button>
-                ))}
+      <div className="space-y-6">
+        {/* Section Profil */}
+        <SectionBlock
+          icon={User}
+          title={t('profile.title')}
+          theme="blue"
+          expandable={true}
+        >
+          <motion.form 
+            className="space-y-2"
+            onSubmit={(e) => e.preventDefault()}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Profile Image Section */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('profile.profileImage')}
+              </label>
+              <div className="flex items-end space-x-4">
+                <div className="relative group">
+                  {userInfo?.profile_image && !imgError ? (
+                    <img 
+                      src={userInfo.profile_image.startsWith('http') ? userInfo.profile_image : `${API_BASE_URL}${userInfo.profile_image}`}
+                      alt={`${userInfo.first_name} ${userInfo.last_name}`}
+                      className="h-28 w-28 rounded-full object-cover border border-gray-200 shadow-sm group-hover:opacity-90 transition-opacity"
+                      onError={() => setImgError(true)}
+                    />
+                  ) : (
+                    <div className="h-28 w-28 rounded-full bg-blue-50 flex items-center justify-center border border-gray-200 shadow-sm">
+                      <UserCircle className="h-16 w-16 text-blue-400" />
+                    </div>
+                  )}
+                  
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="bg-black bg-opacity-40 rounded-full h-28 w-28 flex items-center justify-center">
+                      <label className="cursor-pointer p-2 bg-blue-500 hover:bg-blue-600 rounded-full text-white transition-colors">
+                        <Camera className="h-5 w-5" />
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              const file = e.target.files[0];
+                              if (file.size > 2 * 1024 * 1024) {
+                                toast.error(t('profile.imageSizeLimit'));
+                                return;
+                              }
+                              dispatch(uploadProfileImage({
+                                imageFile: file,
+                                first_name: profileData.firstName,
+                                last_name: profileData.lastName,
+                                phone: phone || ''
+                              }))
+                                .unwrap()
+                                .then(() => {
+                                  toast.success(t('profile.imageUploaded'));
+                                  dispatch(getProfile());
+                                })
+                                .catch((error) => {
+                                  toast.error(t('profile.imageUploadError'));
+                                });
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col space-y-3">
+                  <div className="text-sm text-gray-600">
+                    <p className="font-medium text-blue-600 mb-1">{t('profile.changeImage')}</p>
+                    <p className="text-xs text-gray-500">{t('profile.imageSizeLimit')}</p>
+                    <p className="text-xs text-gray-500">{t('profile.imageFormatSupport')}</p>
+                  </div>
+                  
+                  {userInfo?.profile_image && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm(t('profile.removeImage') + "?")) {
+                          const first_name = userInfo?.first_name;
+                          const last_name = userInfo?.last_name;
+                          if (!first_name || !last_name) {
+                            toast.error('Impossible de supprimer l\'image : prénom ou nom manquant.');
+                            return;
+                          }
+                          const payload = {
+                            first_name,
+                            last_name,
+                            phone: phone || ''
+                          };
+                          dispatch(removeProfileImage(payload))
+                            .unwrap()
+                            .then(() => {
+                              toast.success(t('profile.imageRemoved'));
+                              setImgError(false);
+                              dispatch(getProfile());
+                            })
+                            .catch((error) => {
+                              toast.error(error);
+                            });
+                        }
+                      }}
+                      className="flex items-center text-sm text-red-500 hover:text-red-700 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      {t('profile.removeImage')}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
             
-            {/* Vertical tabs for desktop */}
-            <nav className="hidden md:block p-2">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabChange(tab.id)}
-                  className={`w-full flex items-center p-3 text-left rounded-lg mb-1 ${
-                    activeTab === tab.id 
-                      ? 'bg-blue-50 text-blue-600' 
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <FormField
+                label={t('profile.firstName')}
+                type="text"
+                name="firstName"
+                value={profileData.firstName}
+                onChange={handleProfileChange}
+                error={profileErrors.firstName}
+                required
+              />
+              <FormField
+                label={t('profile.lastName')}
+                type="text"
+                name="lastName"
+                value={profileData.lastName}
+                onChange={handleProfileChange}
+                error={profileErrors.lastName}
+                required
+              />
+            </div>
+            <FormField
+              label={t('profile.email')}
+              type="email"
+              name="email"
+              value={profileData.email}
+              onChange={handleProfileChange}
+              error={profileErrors.email}
+              disabled={true}
+              readOnly={true}
+              helpText={t('profile.emailChangeInSecurity')}
+            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.phone')}</label>
+              <PhoneInput
+                country={'fr'}
+                value={phone}
+                onChange={handlePhoneChange}
+                inputStyle={{
+                  width: '100%',
+                  height: '42px',
+                  fontSize: '16px',
+                  borderRadius: '0.5rem',
+                  borderColor: profileErrors.phone ? '#ef4444' : '#d1d5db'
+                }}
+                buttonStyle={{
+                  borderTopLeftRadius: '0.5rem',
+                  borderBottomLeftRadius: '0.5rem',
+                  borderColor: profileErrors.phone ? '#ef4444' : '#d1d5db'
+                }}
+                containerClass="phone-input-container"
+                dropdownStyle={{
+                  width: '300px'
+                }}
+              />
+              {profileErrors.phone && (
+                <motion.div 
+                  className="w-full"
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <tab.icon className={`h-5 w-5 mr-3 ${
-                    activeTab === tab.id ? 'text-blue-600' : 'text-gray-500'
-                  }`} />
-                  {tab.name}
-                </button>
-              ))}
-            </nav>
-          </div>
-          
-          {/* Content */}
-          <div className="flex-1 p-6">
-            {activeTab === 'profile' && (
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">{t('profile.title')}</h3>
-                <motion.form 
-                  className="space-y-2"
-                  onSubmit={(e) => e.preventDefault()}
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-red-500">
+                    {profileErrors.phone}
+                  </span>
+                </motion.div>
+              )}
+            </div>
+            <div>
+              <SubmitButton 
+                text={t('profile.saveChanges')}
+                isLoading={profileFormState.isLoading}
+                isSuccess={profileFormState.isSuccess}
+                isError={profileFormState.isError}
+                errorMessage={profileFormState.message}
+                errorText={t('submitButton.error')}
+                successText={t('profile.profileUpdated')}
+                successMessage={t('profile.profileUpdatedSuccess')}
+                onClick={handleProfileSubmit}
+                useTranslations={true}
+                className="w-auto rounded-md py-2 px-8 transition-all duration-200 shadow-sm hover:shadow font-medium"
+                variant="solid"
+                color="blue"
+                resetDelay={5000}
+              />
+            </div>
+          </motion.form>
+        </SectionBlock>
+
+        {/* Section Sécurité */}
+        <SectionBlock
+          icon={Lock}
+          title={t('security.title')}
+          theme="indigo"
+          expandable={true}
+        >
+          <div className="space-y-6">
+            {/* Changement de mot de passe */}
+            <div>
+              <h4 className="text-md font-medium text-gray-800 mb-2">{t('security.changePassword')}</h4>
+              <motion.form 
+                className="space-y-4 p-4 border border-gray-200 rounded-lg" 
+                onSubmit={(e) => e.preventDefault()}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <FormField
+                  label={t('security.currentPassword')}
+                  type="password"
+                  name="current_password"
+                  value={passwordData.current_password}
+                  onChange={handlePasswordChange}
+                  error={passwordErrors.current_password}
+                  showPasswordToggle
+                  showPassword={showPasswords.current_password}
+                  onTogglePassword={() => togglePasswordVisibility('current_password')}
+                  required
+                />
+                <FormField
+                  label={t('security.newPassword')}
+                  type="password"
+                  name="new_password"
+                  value={passwordData.new_password}
+                  onChange={handlePasswordChange}
+                  error={passwordErrors.new_password}
+                  showPasswordToggle
+                  showPassword={showPasswords.new_password}
+                  onTogglePassword={() => togglePasswordVisibility('new_password')}
+                  required
+                />
+                <FormField
+                  label={t('security.confirmPassword')}
+                  type="password"
+                  name="re_new_password"
+                  value={passwordData.re_new_password}
+                  onChange={handlePasswordChange}
+                  error={passwordErrors.re_new_password}
+                  showPasswordToggle
+                  showPassword={showPasswords.re_new_password}
+                  onTogglePassword={() => togglePasswordVisibility('re_new_password')}
+                  required
+                />
+                <div>
+                  <SubmitButton 
+                    text={t('security.updatePassword')}
+                    isLoading={passwordFormState.isLoading}
+                    isSuccess={passwordFormState.isSuccess}
+                    isError={passwordFormState.isError}
+                    errorMessage={passwordFormState.message}
+                    errorText={t('submitButton.passwordError')}
+                    successText={t('security.passwordUpdated')}
+                    successMessage={t('security.passwordUpdatedSuccess')}
+                    onClick={handlePasswordSubmit}
+                    useTranslations={true}
+                    className="w-auto rounded-md py-2 px-8 transition-all duration-200 shadow-sm hover:shadow font-medium"
+                    variant="solid"
+                    color="blue"
+                    resetDelay={10000}
+                  />
+                  {(passwordErrors.current_password || (passwordFormState.isError && passwordFormState.message === 'CURRENT_PASSWORD_INCORRECT')) && (
+                    <div className="mt-4 text-sm text-gray-600">
+                      <a 
+                        href="/reset-password" 
+                        className="text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        {t('security.forgotPassword')} ?
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </motion.form>
+            </div>
+
+            {/* Changement d'email */}
+            <div>
+              <h4 className="text-md font-medium text-gray-800 mb-2">{t('security.changeEmail')}</h4>
+              <motion.form 
+                className="space-y-4 p-4 border border-gray-200 rounded-lg"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                onSubmit={(e) => e.preventDefault()}
+              >
+                <FormField
+                  label={t('security.currentEmail')}
+                  type="email"
+                  value={profileData.email}
+                  disabled={true}
+                  readOnly={true}
+                />
+                <FormField
+                  label={t('security.newEmail')}
+                  type="email"
+                  name="new_email"
+                  value={emailData.new_email}
+                  onChange={handleEmailChange}
+                  error={emailErrors.new_email}
+                  required
+                />
+                <FormField
+                  label={t('security.confirmNewEmail')}
+                  type="email"
+                  name="re_new_email"
+                  value={emailData.re_new_email}
+                  onChange={handleEmailChange}
+                  error={emailErrors.re_new_email}
+                  required
+                />
+                <FormField
+                  label={t('security.currentPassword')}
+                  type="password"
+                  name="current_password"
+                  value={emailData.current_password}
+                  onChange={handleEmailChange}
+                  error={emailErrors.current_password}
+                  showPasswordToggle
+                  showPassword={showPasswords.current_password}
+                  onTogglePassword={() => togglePasswordVisibility('current_password')}
+                  required
+                />
+                <div>
+                  <SubmitButton 
+                    text={t('emailSubmitButton.submit')}
+                    isLoading={emailFormState.isLoading}
+                    isSuccess={emailFormState.isSuccess}
+                    isError={emailFormState.isError}
+                    errorMessage={emailFormState.message}
+                    errorText={t('emailSubmitButton.error')}
+                    successText={t('emailSubmitButton.success')}
+                    successMessage={t('security.emailUpdatedSuccess')}
+                    onClick={handleEmailSubmit}
+                    useTranslations={true}
+                    className="w-auto rounded-md py-2 px-8 transition-all duration-200 shadow-sm hover:shadow font-medium"
+                    variant="solid"
+                    color="blue"
+                    resetDelay={5000}
+                  />
+                  {(emailErrors.current_password || (emailFormState.isError && emailFormState.message === 'CURRENT_PASSWORD_INCORRECT')) && (
+                    <div className="mt-2 text-sm text-gray-600">
+                      <a 
+                        href="/reset-password" 
+                        className="text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        {t('security.forgotPassword')} ?
+                      </a>
+                    </div>
+                  )}
+                </div>
+                {pendingEmailChange && (
+                  <GeneralMessage
+                    type="success"
+                    message={
+                      <div>
+                        <p className="font-medium">{t('security.pendingEmailChange')} - {pendingEmailChange.email}</p>
+                        <p className="text-sm mt-1">{t('security.checkVerificationLink')}</p>
+                      </div>
+                    }
+                    onClose={() => setPendingEmailChange(null)}
+                  />
+                )}
+              </motion.form>
+            </div>
+
+            {/* Suppression de compte */}
+            <div className="mt-12 pt-6 border-t border-gray-200">
+              <div className="flex justify-center">
+                <motion.div 
+                  className="mt-4" 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {/* Profile Image Section */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('profile.profileImage')}
-                    </label>
-                    <div className="flex items-end space-x-4">
-                      <div className="relative group">
-                        {userInfo?.profile_image && !imgError ? (
-                          <img 
-                            src={userInfo.profile_image.startsWith('http') ? userInfo.profile_image : `${API_BASE_URL}${userInfo.profile_image}`}
-                            alt={`${userInfo.first_name} ${userInfo.last_name}`}
-                            className="h-28 w-28 rounded-full object-cover border border-gray-200 shadow-sm group-hover:opacity-90 transition-opacity"
-                            onError={() => setImgError(true)}
-                          />
-                        ) : (
-                          <div className="h-28 w-28 rounded-full bg-blue-50 flex items-center justify-center border border-gray-200 shadow-sm">
-                            <UserCircle className="h-16 w-16 text-blue-400" />
-                          </div>
-                        )}
-                        
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="bg-black bg-opacity-40 rounded-full h-28 w-28 flex items-center justify-center">
-                            <label className="cursor-pointer p-2 bg-blue-500 hover:bg-blue-600 rounded-full text-white transition-colors">
-                              <Camera className="h-5 w-5" />
-                              <input 
-                                type="file" 
-                                className="hidden" 
-                                accept="image/*"
-                                onChange={(e) => {
-                                  if (e.target.files && e.target.files[0]) {
-                                    const file = e.target.files[0];
-                                    // Check file size (2MB limit)
-                                    if (file.size > 2 * 1024 * 1024) {
-                                      toast.error(t('profile.imageSizeLimit'));
-                                      return;
-                                    }
-                                    // Log pour debug
-                                    console.log('UPLOAD IMAGE - file:', file, 'firstName:', profileData.firstName, 'lastName:', profileData.lastName, 'phone:', phone);
-                                    console.log('profile_image:', userInfo?.profile_image, 'API_BASE_URL:', API_BASE_URL);
-                                    dispatch(uploadProfileImage({
-                                      imageFile: file,
-                                      first_name: profileData.firstName,
-                                      last_name: profileData.lastName,
-                                      phone: phone || ''
-                                    }))
-                                      .unwrap()
-                                      .then(() => {
-                                        toast.success(t('profile.imageUploaded'));
-                                        dispatch(getProfile());
-                                      })
-                                      .catch((error) => {
-                                        toast.error(t('profile.imageUploadError'));
-                                      });
-                                  }
-                                }}
-                              />
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-col space-y-3">
-                        <div className="text-sm text-gray-600">
-                          <p className="font-medium text-blue-600 mb-1">{t('profile.changeImage')}</p>
-                          <p className="text-xs text-gray-500">{t('profile.imageSizeLimit')}</p>
-                          <p className="text-xs text-gray-500">{t('profile.imageFormatSupport')}</p>
-                        </div>
-                        
-                        {userInfo?.profile_image && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (window.confirm(t('profile.removeImage') + "?")) {
-                                // Toujours utiliser userInfo pour les champs obligatoires
-                                const first_name = userInfo?.first_name;
-                                const last_name = userInfo?.last_name;
-                                if (!first_name || !last_name) {
-                                  toast.error('Impossible de supprimer l\'image : prénom ou nom manquant.');
-                                  return;
-                                }
-                                const payload = {
-                                  first_name,
-                                  last_name,
-                                  phone: phone || ''
-                                };
-                                console.log('Suppression image - payload:', payload);
-                                dispatch(removeProfileImage(payload))
-                                  .unwrap()
-                                  .then(() => {
-                                    toast.success(t('profile.imageRemoved'));
-                                    setImgError(false);
-                                    dispatch(getProfile());
-                                  })
-                                  .catch((error) => {
-                                    console.error('Erreur suppression image (objet complet):', error);
-                                    if (error.response && error.response.data) {
-                                      const data = error.response.data;
-                                      if (data.first_name) {
-                                        data.first_name.forEach((msg, i) => {
-                                          console.error(`Erreur backend first_name [${i}]:`, msg);
-                                        });
-                                      }
-                                      if (data.last_name) {
-                                        data.last_name.forEach((msg, i) => {
-                                          console.error(`Erreur backend last_name [${i}]:`, msg);
-                                        });
-                                      }
-                                    }
-                                    toast.error(error);
-                                  });
-                              }
-                            }}
-                            className="flex items-center text-sm text-red-500 hover:text-red-700 transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            {t('profile.removeImage')}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <FormField
-                      label={t('profile.firstName')}
-                      type="text"
-                      name="firstName"
-                      value={profileData.firstName}
-                      onChange={handleProfileChange}
-                      error={profileErrors.firstName}
-                      required
-                    />
-                    <FormField
-                      label={t('profile.lastName')}
-                      type="text"
-                      name="lastName"
-                      value={profileData.lastName}
-                      onChange={handleProfileChange}
-                      error={profileErrors.lastName}
-                      required
-                    />
-                  </div>
-                  <FormField
-                    label={t('profile.email')}
-                    type="email"
-                    name="email"
-                    value={profileData.email}
-                    onChange={handleProfileChange}
-                    error={profileErrors.email}
-                    disabled={true}
-                    readOnly={true}
-                    helpText={t('profile.emailChangeInSecurity')}
-                  />
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.phone')}</label>
-                    <PhoneInput
-                      country={'fr'}
-                      value={phone}
-                      onChange={handlePhoneChange}
-                      inputStyle={{
-                        width: '100%',
-                        height: '42px',
-                        fontSize: '16px',
-                        borderRadius: '0.5rem',
-                        borderColor: profileErrors.phone ? '#ef4444' : '#d1d5db'
-                      }}
-                      buttonStyle={{
-                        borderTopLeftRadius: '0.5rem',
-                        borderBottomLeftRadius: '0.5rem',
-                        borderColor: profileErrors.phone ? '#ef4444' : '#d1d5db'
-                      }}
-                      containerClass="phone-input-container"
-                      dropdownStyle={{
-                        width: '300px'
-                      }}
-                    />
-                    <div className="h-4">
-                      {profileErrors.phone && (
-                        <motion.div 
-                          className="w-full"
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ 
-                            duration: 0.3,
-                            ease: [0.4, 0, 0.2, 1]
-                          }}
-                        >
-                          <span className="text-[10px] font-semibold uppercase tracking-wide text-red-500">
-                            {profileErrors.phone}
-                          </span>
-                        </motion.div>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <SubmitButton 
-                      text={t('profile.saveChanges')}
-                      isLoading={profileFormState.isLoading}
-                      isSuccess={profileFormState.isSuccess}
-                      isError={profileFormState.isError}
-                      errorMessage={profileFormState.message}
-                      errorText={t('submitButton.error')}
-                      successText={t('profile.profileUpdated')}
-                      successMessage={t('profile.profileUpdatedSuccess')}
-                      onClick={handleProfileSubmit}
-                      useTranslations={true}
-                      className="w-auto rounded-md py-2 px-8 transition-all duration-200 shadow-sm hover:shadow font-medium"
-                      variant="solid"
-                      color="blue"
-                      resetDelay={5000}
-                    />
-                    <div className="h-6"></div> {/* Extra space to prevent layout shifts */}
-                  </div>
-                </motion.form>
+                  <button 
+                    className="px-6 py-2.5 bg-white border border-red-500 text-red-600 rounded-lg hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 flex items-center shadow-sm font-medium"
+                    onClick={handleDeleteAccountClick}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    {t('security.deleteAccountButton')}
+                  </button>
+                </motion.div>
               </div>
-            )}
-            
-            {activeTab === 'security' && (
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">{t('security.title')}</h3>
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="text-md font-medium text-gray-800 mb-2">{t('security.changePassword')}</h4>
-                    <div className="relative">
-                      <motion.form 
-                        className="space-y-4 p-4 border border-gray-200 rounded-lg" 
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          // Ne pas appeler handlePasswordSubmit ici car il sera appelé par le SubmitButton
-                        }}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <FormField
-                          label={t('security.currentPassword')}
-                          type="password"
-                          name="current_password"
-                          value={passwordData.current_password}
-                          onChange={handlePasswordChange}
-                          error={passwordErrors.current_password}
-                          showPasswordToggle
-                          showPassword={showPasswords.current_password}
-                          onTogglePassword={() => togglePasswordVisibility('current_password')}
-                          required
-                        />
-                        <FormField
-                          label={t('security.newPassword')}
-                          type="password"
-                          name="new_password"
-                          value={passwordData.new_password}
-                          onChange={handlePasswordChange}
-                          error={passwordErrors.new_password}
-                          showPasswordToggle
-                          showPassword={showPasswords.new_password}
-                          onTogglePassword={() => togglePasswordVisibility('new_password')}
-                          required
-                        />
-                        <FormField
-                          label={t('security.confirmPassword')}
-                          type="password"
-                          name="re_new_password"
-                          value={passwordData.re_new_password}
-                          onChange={handlePasswordChange}
-                          error={passwordErrors.re_new_password}
-                          showPasswordToggle
-                          showPassword={showPasswords.re_new_password}
-                          onTogglePassword={() => togglePasswordVisibility('re_new_password')}
-                          required
-                        />
-                        <div>
-                          {/* Bouton de soumission */}
-                          <div className="flex justify-start">
-                            <SubmitButton 
-                              text={t('security.updatePassword')}
-                              isLoading={passwordFormState.isLoading}
-                              isSuccess={passwordFormState.isSuccess}
-                              isError={passwordFormState.isError}
-                              errorMessage={passwordFormState.message}
-                              errorText={t('submitButton.passwordError')}
-                              successText={t('security.passwordUpdated')}
-                              successMessage={t('security.passwordUpdatedSuccess')}
-                              onClick={handlePasswordSubmit}
-                              useTranslations={true}
-                              className="w-auto rounded-md py-2 px-8 transition-all duration-200 shadow-sm hover:shadow font-medium"
-                              variant="solid"
-                              color="blue"
-                              resetDelay={10000}
-                            />
-                            <div className="h-6"></div> {/* Extra space to prevent layout shifts */}
-                          </div>
-                          
-                          {/* Lien mot de passe oublié - visible uniquement quand le mot de passe actuel est incorrect */}
-                          {(passwordErrors.current_password || (passwordFormState.isError && passwordFormState.message === 'CURRENT_PASSWORD_INCORRECT')) && (
-                            <div className="mt-4 text-sm text-gray-600">
-                              <a 
-                                href="/reset-password" 
-                                className="text-blue-600 hover:text-blue-800 hover:underline"
-                              >
-                                {t('security.forgotPassword')} ?
-                              </a>
-                            </div>
-                          )}
-                        </div>
-                      </motion.form>
-                    </div>
-                  </div>
-
-                  {/* Nouvelle section pour modifier l'adresse email */}
-                  <div>
-                    <h4 className="text-md font-medium text-gray-800 mb-2">{t('security.changeEmail')}</h4>
-                    <div className="relative">
-                      <motion.form 
-                        className="space-y-4 p-4 border border-gray-200 rounded-lg"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        onSubmit={(e) => e.preventDefault()}
-                      >
-                        <FormField
-                          label={t('security.currentEmail')}
-                          type="email"
-                          value={profileData.email}
-                          disabled={true}
-                          readOnly={true}
-                        />
-                        
-                        <FormField
-                          label={t('security.newEmail')}
-                          type="email"
-                          name="new_email"
-                          value={emailData.new_email}
-                          onChange={handleEmailChange}
-                          error={emailErrors.new_email}
-                          required
-                        />
-                        
-                        <FormField
-                          label={t('security.confirmNewEmail')}
-                          type="email"
-                          name="re_new_email"
-                          value={emailData.re_new_email}
-                          onChange={handleEmailChange}
-                          error={emailErrors.re_new_email}
-                          required
-                        />
-                        
-                        <FormField
-                          label={t('security.currentPassword')}
-                          type="password"
-                          name="current_password"
-                          value={emailData.current_password}
-                          onChange={handleEmailChange}
-                          error={emailErrors.current_password}
-                          showPasswordToggle
-                          showPassword={showPasswords.current_password}
-                          onTogglePassword={() => togglePasswordVisibility('current_password')}
-                          required
-                        />
-                        
-                        <div className="flex justify-start">
-                          <SubmitButton 
-                            text={t('emailSubmitButton.submit')}
-                            isLoading={emailFormState.isLoading}
-                            isSuccess={emailFormState.isSuccess}
-                            isError={emailFormState.isError}
-                            errorMessage={emailFormState.message}
-                            errorText={t('emailSubmitButton.error')}
-                            successText={t('emailSubmitButton.success')}
-                            successMessage={t('security.emailUpdatedSuccess')}
-                            onClick={handleEmailSubmit}
-                            useTranslations={true}
-                            className="w-auto rounded-md py-2 px-8 transition-all duration-200 shadow-sm hover:shadow font-medium"
-                            variant="solid"
-                            color="blue"
-                            resetDelay={5000}
-                            icon={
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                              </svg>
-                            }
-                          />
-                          <div className="h-6"></div> {/* Extra space to prevent layout shifts */}
-                        </div>
-                        
-                        {/* Remplacer le message existant par GeneralMessage */}
-                        {pendingEmailChange && (
-                          <GeneralMessage
-                            type="success"
-                            message={
-                              <div>
-                                <p className="font-medium">{t('security.pendingEmailChange')} - {pendingEmailChange.email}</p>
-                                <p className="text-sm mt-1">{t('security.checkVerificationLink')}</p>
-                              </div>
-                            }
-                            onClose={() => setPendingEmailChange(null)}
-                          />
-                        )}
-                          
-                        {/* Lien mot de passe oublié - visible uniquement quand le mot de passe actuel est incorrect */}
-                        {(emailErrors.current_password || (emailFormState.isError && emailFormState.message === 'CURRENT_PASSWORD_INCORRECT')) && (
-                          <div className="mt-2 text-sm text-gray-600">
-                            <a 
-                              href="/reset-password" 
-                              className="text-blue-600 hover:text-blue-800 hover:underline"
-                            >
-                              {t('security.forgotPassword')} ?
-                            </a>
-                          </div>
-                        )}
-                      </motion.form>
-                    </div>
-                  </div>
-
-                  {/* Section pour supprimer le compte - maintenant détachée et placée plus bas */}
-                  <div className="mt-12 pt-6 border-t border-gray-200">
-                    <div className="flex justify-center">
-                      <motion.div 
-                        className="mt-4" 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <button 
-                          className="px-6 py-2.5 bg-white border border-red-500 text-red-600 rounded-lg hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 flex items-center shadow-sm font-medium"
-                          onClick={handleDeleteAccountClick}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                          {t('security.deleteAccountButton')}
-                        </button>
-                      </motion.div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {activeTab === 'language' && (
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">{t('language.title')}</h3>
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-600 mb-4">
-                    {t('language.chooseLang')}
-                  </p>
-                  
-                  <div className="grid grid-cols-1 gap-3">
-                    {languages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => handleLanguageChange(lang.code)}
-                        className={`flex items-center justify-between px-4 py-3 border rounded-lg ${
-                          selectedLanguage === lang.code 
-                            ? 'border-blue-500 bg-blue-50' 
-                            : 'border-gray-200 hover:bg-gray-50'
-                        }`}
-                      >
-                        <div className="flex items-center">
-                          <span className="text-xl mr-3">
-                            <Flag code={lang.flag} className="h-5 w-8 rounded-sm object-cover shadow-sm" />
-                          </span>
-                          <span className="font-medium">{lang.name}</span>
-                        </div>
-                        
-                        {selectedLanguage === lang.code && (
-                          <Check className="h-5 w-5 text-blue-600" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {activeTab !== 'profile' && activeTab !== 'security' && activeTab !== 'language' && (
-              <div className="flex items-center justify-center h-64 text-gray-500">
-                {t('language.inDevelopment', { section: tabs.find(tab => tab.id === activeTab)?.name })}
-              </div>
-            )}
+            </div>
           </div>
-        </div>
+        </SectionBlock>
+
+        {/* Section Langue */}
+        <SectionBlock
+          icon={Globe}
+          title={t('language.title')}
+          theme="purple"
+          expandable={true}
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600 mb-4">
+              {t('language.chooseLang')}
+            </p>
+            <div className="grid grid-cols-1 gap-3">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => handleLanguageChange(lang.code)}
+                  className={`flex items-center justify-between px-4 py-3 border rounded-lg ${
+                    selectedLanguage === lang.code 
+                      ? 'border-purple-500 bg-purple-50' 
+                      : 'border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <span className="text-xl mr-3">
+                      <Flag code={lang.flag} className="h-5 w-8 rounded-sm object-cover shadow-sm" />
+                    </span>
+                    <span className="font-medium">{lang.name}</span>
+                  </div>
+                  {selectedLanguage === lang.code && (
+                    <Check className="h-5 w-5 text-purple-600" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </SectionBlock>
+
+        {/* Section Notifications (en développement) */}
+        <SectionBlock
+          icon={Bell}
+          title={t('tabs.notifications')}
+          theme="amber"
+          expandable={true}
+        >
+          <div className="flex items-center justify-center h-32 text-gray-500">
+            {t('language.inDevelopment', { section: t('tabs.notifications') })}
+          </div>
+        </SectionBlock>
+
+        {/* Section Facturation (en développement) */}
+        <SectionBlock
+          icon={CreditCard}
+          title={t('tabs.billing')}
+          theme="green"
+          expandable={true}
+        >
+          <div className="flex items-center justify-center h-32 text-gray-500">
+            {t('language.inDevelopment', { section: t('tabs.billing') })}
+          </div>
+        </SectionBlock>
       </div>
-      
+
       {/* Styles personnalisés pour le sélecteur de téléphone */}
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -1610,7 +1532,7 @@ const Settings = () => {
         }
         `
       }} />
-      
+
       {/* Modal de confirmation pour la suppression de compte */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
