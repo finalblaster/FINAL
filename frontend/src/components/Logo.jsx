@@ -253,7 +253,7 @@ const Logo = (props) => {
         </ellipse>
       </g>
 
-      {/* Ajout du texte "Sputnik" à droite du logo */}
+      {/* Ajout du texte "Zoopok" à droite du logo */}
       <text x="110" y="60" textAnchor="start" fontSize="50" fontFamily="Arial, sans-serif" fontWeight="bold">
         <tspan fill="black" fontWeight="400" dx="-14">Zoo</tspan>
         <tspan fill="#3b82f6" dx="-5" fontWeight="550">pok</tspan>

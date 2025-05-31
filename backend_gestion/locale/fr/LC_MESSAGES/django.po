@@ -198,8 +198,8 @@ msgid "Si vous avez des questions ou besoin d'aide, notre équipe reste disponib
 msgstr "Si vous avez des questions ou besoin d'aide, notre équipe reste disponible."
 
 # New translations from activation_changement_username.html
-msgid "Logo Sputnik"
-msgstr "Logo Sputnik"
+msgid "Logo Zoopok"
+msgstr "Logo Zoopok"
 
 msgid "Confirmez le changement de votre adresse email"
 msgstr "Confirmez le changement de votre adresse email"
@@ -245,8 +245,8 @@ msgstr "Une demande de changement d'adresse email a été effectuée sur votre c
 msgid "Si vous n'êtes pas à l'origine de cette demande, veuillez réinitialiser votre mot de passe immédiatement en cliquant sur le lien ci-dessous :"
 msgstr "Si vous n'êtes pas à l'origine de cette demande, veuillez réinitialiser votre mot de passe immédiatement en cliquant sur le lien ci-dessous :"
 
-msgid "Contact : support@sputnik.com"
-msgstr "Contact : support@sputnik.com"
+msgid "Contact : support@zoopokcom.com"
+msgstr "Contact : support@zoopokcom"
 
 msgid "Par mesure de sécurité, nous vous recommandons de changer régulièrement votre mot de passe."
 msgstr "Par mesure de sécurité, nous vous recommandons de changer régulièrement votre mot de passe."

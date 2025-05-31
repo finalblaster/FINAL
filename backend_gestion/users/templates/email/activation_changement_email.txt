@@ -14,5 +14,5 @@
 {% blocktrans with site_name=site_name %}L'équipe {{ site_name }}{% endblocktrans %}
 
 {% trans "Visitez notre site :" %} {{ protocol }}://{{ domain }}
-{% trans "Contactez le support :" %} support@sputnik.com
+{% trans "Contactez le support :" %} support@zoopok.com
 

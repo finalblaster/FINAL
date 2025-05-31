@@ -4,4 +4,4 @@ Merci de vous être inscrit ! Veuillez cliquer sur le lien ci-dessous pour activ
 {{ protocol }}://{{ domain }}{% url 'user_activation' uid=uid token=token %}
 
 Cordialement,
-L'équipe de Sputnik
+L'équipe de Zoopok

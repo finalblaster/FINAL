@@ -55,7 +55,7 @@ export default function PrivacyPage() {
                 {t('privacy.introduction.title', 'Introduction')}
               </h2>
               <p className="text-gray-600 mb-4">
-                {t('privacy.introduction.content', 'Chez Sputnik, nous nous engageons à protéger votre vie privée et vos données personnelles. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos informations dans le cadre de notre service de conciergerie numérique.')}
+                {t('privacy.introduction.content', 'Chez Zoopok, nous nous engageons à protéger votre vie privée et vos données personnelles. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos informations dans le cadre de notre service de conciergerie numérique.')}
               </p>
             </section>
 
@@ -138,7 +138,7 @@ export default function PrivacyPage() {
                 {t('privacy.contact.content', 'Pour toute question concernant notre politique de confidentialité ou pour exercer vos droits, veuillez nous contacter à :')}
               </p>
               <p className="text-blue-600 font-medium mt-2">
-                {t('privacy.contact.email', 'privacy@sputnik.fr')}
+                {t('privacy.contact.email', 'privacy@zoopok.fr')}
               </p>
             </section>
 

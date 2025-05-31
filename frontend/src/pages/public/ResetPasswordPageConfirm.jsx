@@ -25,7 +25,7 @@ const pageNames = {
 
 // Textes spécifiques pour l'espagnol
 const esTranslations = {
-  pageTitle: 'Restablecer Contraseña - Sputnik',
+  pageTitle: 'Restablecer Contraseña - Zoopok',
   title: 'Restablecer su contraseña',
   subtitle: 'Ingrese su nueva contraseña a continuación.',
   newPasswordLabel: 'Nueva contraseña',
@@ -44,7 +44,7 @@ const esTranslations = {
 
 // Textes spécifiques pour le français
 const frTranslations = {
-  pageTitle: 'Réinitialiser le mot de passe - Sputnik',
+  pageTitle: 'Réinitialiser le mot de passe - Zoopok',
   title: 'Réinitialiser votre mot de passe',
   subtitle: 'Entrez votre nouveau mot de passe ci-dessous.',
   newPasswordLabel: 'Nouveau mot de passe',
@@ -63,7 +63,7 @@ const frTranslations = {
 
 // Textes spécifiques pour l'anglais
 const enTranslations = {
-  pageTitle: 'Reset Password - Sputnik',
+  pageTitle: 'Reset Password - Zoopok',
   title: 'Reset your password',
   subtitle: 'Enter your new password below.',
   newPasswordLabel: 'New password',
@@ -82,7 +82,7 @@ const enTranslations = {
 
 // Textes spécifiques pour l'allemand
 const deTranslations = {
-  pageTitle: 'Passwort zurücksetzen - Sputnik',
+  pageTitle: 'Passwort zurücksetzen - Zoopok',
   title: 'Setzen Sie Ihr Passwort zurück',
   subtitle: 'Geben Sie unten Ihr neues Passwort ein.',
   newPasswordLabel: 'Neues Passwort',

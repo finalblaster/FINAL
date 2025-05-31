@@ -249,7 +249,7 @@
     </ellipse>
   </g>
 
-  <!-- Ajout du texte "Sputnik" à droite du logo -->
+  <!-- Ajout du texte "Zoopok" à droite du logo -->
   <text x="110" y="60" text-anchor="start" font-size="50" font-family="Arial, sans-serif" font-weight="bold">
     <tspan fill="black" font-weight="400" dx="-14">Zoo</tspan>
     <tspan fill="#3b82f6" dx="-17" font-weight="550">pok</tspan>

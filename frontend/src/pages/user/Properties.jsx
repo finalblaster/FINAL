@@ -5,9 +5,11 @@ import PageHeader from '../../components/PageHeader';
 import PropertyFilter from '../../components/shared/PropertyFilter';
 import StatisticsGrid from '../../components/shared/StatisticsGrid';
 import PropertyCard from '../../components/properties/PropertyCard';
+import PropertyForm from '../../components/properties/PropertyForm';
 
 const Properties = () => {
   const { t } = useTranslation();
+  const [showForm, setShowForm] = useState(false);
   
   const [selectedProperty, setSelectedProperty] = useState('all');
   const [timeFilter, setTimeFilter] = useState('7j');
@@ -141,9 +143,12 @@ const Properties = () => {
         subtitle="properties.subtitle"
         icon={Building}
         action={
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={() => setShowForm(!showForm)}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <Plus className="h-5 w-5 mr-2" />
-            {t('properties.addProperty')}
+            {showForm ? t('properties.cancel') : t('properties.addProperty')}
           </button>
         }
       />
@@ -159,6 +164,12 @@ const Properties = () => {
         />
         
         <StatisticsGrid stats={stats} />
+        
+        {showForm && (
+          <div className="mb-8">
+            <PropertyForm onSuccess={() => setShowForm(false)} />
+          </div>
+        )}
         
         <div className="w-full mt-6 space-y-6">
           {properties.map((property) => (

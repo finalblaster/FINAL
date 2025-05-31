@@ -10,7 +10,7 @@ const testimonials = [
   [
     {
       content:
-        "Grâce à Sputnik, les clients ne m'emmerdent plus à me demander comment allumer la machine à laver, maintenant j'ai du temps pour mes poisons.",
+        "Grâce à Zoopok, les clients ne m'emmerdent plus à me demander comment allumer la machine à laver, maintenant j'ai du temps pour mes poisons.",
       author: {
         name: 'Hassan Bongoo',
         role: 'Ambassadeur et Médiateur Social du 7',

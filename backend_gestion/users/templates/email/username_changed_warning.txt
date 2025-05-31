@@ -33,6 +33,6 @@ L'équipe de {{ site_name }}
 {% endblocktrans %}
 
 {% blocktrans %}
-Contact : support@sputnik.com
+Contact : support@zoopokcom
 {% endblocktrans %}
 {% endblock text_body %}
